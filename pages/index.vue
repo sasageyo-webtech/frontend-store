@@ -1,8 +1,7 @@
 <template>
     <div>
-        Home Page
+        <LayoutsImageslide></LayoutsImageslide>
     </div>
-    
 </template>
 
 <script setup>
