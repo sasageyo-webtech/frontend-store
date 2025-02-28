@@ -1,15 +1,13 @@
+
+<!-- Login First -->
+
 <template>
     <div class="p-8">
-        <div class="flex justify-between">
-            <strong class="text-xl font-semibold align-baseline">All Products</strong>
-            <LayoutsSearchbar></LayoutsSearchbar>
+        <div class="flex">
+            <strong class="text-xl font-semibold align-baseline">Wish List</strong>
         </div>
 
         <div class="flex">
-
-            <div>
-                <LayoutsSidebar></LayoutsSidebar>
-            </div>
 
            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
             <div 
@@ -56,7 +54,7 @@ useHead({
     ]
 })
 
-const { data: data } = await useFetch('https://dummyjson.com/products?limit=10')
+const { data: data } = await useFetch('https://dummyjson.com/products?limit=3')
 console.log(data)
 
 </script>
