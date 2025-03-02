@@ -2,13 +2,13 @@
     <div class="p-8">
         <div class="flex justify-between">
             <strong class="text-xl font-semibold align-baseline">All Products</strong>
-            <LayoutsSearchbar></LayoutsSearchbar>
+            <Searchbar></Searchbar>
         </div>
 
         <div class="flex">
 
             <div>
-                <LayoutsSidebar></LayoutsSidebar>
+                <Sidebar></Sidebar>
             </div>
 
            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">

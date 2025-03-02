@@ -1,27 +1,21 @@
 <template>
     <div>
-        <LayoutsImageslide></LayoutsImageslide>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-
-            <LayoutsImagesllidexs></LayoutsImagesllidexs>
-        </div>
-
+        <Imageslide></Imageslide>
        
-        <div class="flex justify-center">
+       
+        <div class="flex justify-center p-7">
             <NuxtLink :to="`/products`" class="btn btn-primary rounded-[50px] text-[15px] px-10 py-5 place-content-center">See all products</NuxtLink>
         </div>
 
-        
-        
         <div class="pb-20">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 place-items-center">
-            <LayoutsImagesllidexs :images="imageSet1" />
-            <LayoutsImagesllidexs :images="imageSet2" />
-            <LayoutsImagesllidexs :images="imageSet2" />
-            <LayoutsImagesllidexs :images="imageSet2" />
-            <LayoutsImagesllidexs :images="imageSet2" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 place-items-center">
+            <Imageslidexs :images="imageSet1" />
+            <Imageslidexs :images="imageSet2" />
+            <Imageslidexs :images="imageSet3" />
+            <Imageslidexs :images="imageSet4" />
+            <Imageslidexs :images="imageSet5" />
             </div>
-        </div>
+        </div> 
         
 
     </div>

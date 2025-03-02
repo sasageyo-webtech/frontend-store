@@ -2,7 +2,7 @@
 <div>
 
     <NuxtLink :to="`/products`" class="flex mx-20 mt-5">
-        <LayoutsSVGLess></LayoutsSVGLess>
+        <svgLess></svgLess>
         <span>Back</span>
     </NuxtLink>
 
@@ -36,7 +36,7 @@
                     
                 </div>
                 <div class="card-actions"> 
-                    <LayoutsSVGHeart></LayoutsSVGHeart>
+                    <svgHeart></svgHeart>
                 
                     <button class="btn btn-primary text-[10px] rounded-[30px]">Add to Cart</button>
                     <button class="btn btn-accent text-[10px] rounded-[30px]">Buy Now</button>
@@ -51,9 +51,9 @@
 
     <h1 class="mx-20 mb-10">Product Reviews</h1>
     <div class="mb-20">
-        <LayoutsProductReviews></LayoutsProductReviews>
-        <LayoutsProductReviews></LayoutsProductReviews>
-        <LayoutsProductReviews></LayoutsProductReviews>
+        <ProductReviews></ProductReviews>
+        <ProductReviews></ProductReviews>
+        <ProductReviews></ProductReviews>
     </div>
 
     

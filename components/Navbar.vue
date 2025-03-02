@@ -5,7 +5,7 @@
       <div class="flex-1 gap-5">
         <NuxtLink class="btn btn-ghost text-xl text-white" to="/">SAsaGEYO</NuxtLink>
         <div class="flex gap-2">
-          <LayoutsSVGLocation></LayoutsSVGLocation>
+          <svgLocation></svgLocation>
           <img src="/img/flag.png">
         </div>
         
