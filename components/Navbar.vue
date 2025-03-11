@@ -1,3 +1,22 @@
+<script setup>
+  import { useRouter } from 'vue-router';
+  import { logout } from '@api/auth'
+
+  const router = useRouter();
+
+  const logoutUser = async () => {
+      try {
+          await logout();
+      } catch (error) {
+          console.error('Logout failed:', error);
+      } finally {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          router.push('/login');
+      }
+  };
+</script>
+
 <template>
     <div class="navbar bg-black">
 
@@ -5,7 +24,7 @@
       <div class="flex-1 gap-5">
         <NuxtLink class="btn btn-ghost text-xl text-white" to="/">SAsaGEYO</NuxtLink>
         <div class="flex gap-2">
-          <svgLocation></svgLocation>
+          <LayoutsSVGLocation></LayoutsSVGLocation>
           <img src="/img/flag.png">
         </div>
         
@@ -88,13 +107,16 @@
               </NuxtLink>
             </li>
             <li><a>Settings</a></li>
-            <li><NuxtLink :to="`/login`">Logout</NuxtLink></li>
+            <button @click="logoutUser" class="bg-red-500 text-white px-4 py-2 rounded">
+                Logout
+            </button>
+
           </ul>
         </div>
       </div>
     </div>
 
-    </template>
+</template>
     
 
 
