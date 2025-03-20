@@ -1,11 +1,13 @@
 <template>
     <div>
-        Profile Customer
+        Profile Staff
     </div>
 </template>
 
 <script setup>
-
+    definePageMeta({
+    layout: 'staff',
+    })
 </script>
 
 <style lang="scss" scoped>
