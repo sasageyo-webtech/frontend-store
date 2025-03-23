@@ -1,12 +1,6 @@
 <template>
     <div>
-        About us
-
-
-
-
-
-        
+        About us        
     </div>
 </template>
 

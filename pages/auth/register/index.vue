@@ -113,7 +113,7 @@
 
                 <div class="flex items-center mt-3 justify-center">
                     <p>Already have an Account?</p>
-                    <NuxtLink to="/login">
+                    <NuxtLink to="/auth/login">
                         <button type="button" class="pl-2 text-blue-700 font-bold">
                             Log In
                         </button>

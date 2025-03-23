@@ -2,7 +2,7 @@
     <div>
       <customerNavbar></customerNavbar>
     <main>
-      <slot />
+      <slot></slot>
     </main>  
     </div>
     

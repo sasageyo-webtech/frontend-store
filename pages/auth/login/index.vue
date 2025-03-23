@@ -21,7 +21,7 @@
         const response = await login(email.value, password.value)
         localStorage.setItem('authToken', response.token)
         localStorage.setItem('user', JSON.stringify(response.user))
-        router.push('/products')
+        router.push('customer/product')
     } catch (error) {
         errorMessage.value = error.message
     } finally {
@@ -55,7 +55,7 @@ definePageMeta({
 
                 <div class="flex items-center mt-3 justify-center">
                     <p>Don't have an account?</p>
-                    <NuxtLink to="/register">
+                    <NuxtLink to="/auth/register">
                         <button type="button" class="pl-2 text-blue-700 font-bold">
                             Sign Up
                         </button>

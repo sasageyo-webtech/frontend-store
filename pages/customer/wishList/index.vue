@@ -16,7 +16,7 @@
                 v-for="(product, index) in data.products" 
                 :key="index">
 
-                <NuxtLink :to="`/products/${product.id}`">
+                <NuxtLink to="/customer/product/${product.id}">
 
                     <figure class="flex justify-center p-4">
                         <img :src="product.thumbnail" class="max-w-full h-40 object-contain" />

@@ -16,7 +16,7 @@
 
       <div class="flex-none pr-7 ml-auto space-x-10">
 
-        <NuxtLink to="/">             
+        <NuxtLink to="/customer">             
         <button class="btn btn-secondary"> Go to Customer's Website </button>
         </NuxtLink>
 

@@ -5,7 +5,7 @@
     <div class="flex">
       <staffSidebar></staffSidebar>
         <main>
-          <slot />
+          <slot></slot>
         </main>
     </div>
     

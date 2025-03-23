@@ -1,9 +1,29 @@
+<script setup>
+  import { useRouter } from 'vue-router';
+  import { logout } from '@api/auth'
+
+  const router = useRouter();
+
+  const logoutUser = async () => {
+      try {
+          await logout();
+      } catch (error) {
+          console.error('Logout failed:', error);
+      } finally {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          router.push('/auth/login');
+      }
+  };
+</script>
+
+
 <template>
     <div class="navbar bg-black">
 
 
       <div class="flex-1 gap-5">
-        <NuxtLink class="btn btn-ghost text-xl text-white" to="/">SAsaGEYO</NuxtLink>
+        <NuxtLink class="btn btn-ghost text-xl text-white" to="/customer">SAsaGEYO</NuxtLink>
         <div class="flex gap-2">
           <svgLocation></svgLocation>
           <img src="/img/flag.png">
@@ -17,7 +37,7 @@
                 <details>
                     <summary class="text-white">Product</summary>
                     <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
-                        <li><NuxtLink to="/product">All products</NuxtLink></li>
+                        <li><NuxtLink to="/customer/product">All products</NuxtLink></li>
                         <ul>
                             <li><NuxtLink>Category 1</NuxtLink></li>
                             <li><NuxtLink>Category 2</NuxtLink></li>
@@ -27,7 +47,7 @@
                     </ul>
                 </details>
             </li>
-            <li><NuxtLink to="/about" class="text-white">About</NuxtLink></li>
+            <li><NuxtLink to="/customer/about" class="text-white">About</NuxtLink></li>
     </ul>
 
     </div>
@@ -35,7 +55,7 @@
 
       <div class="flex-none pr-7 ml-auto">
 
-        <NuxtLink :to="`/wishList`" class="pr-2">
+        <NuxtLink to="/customer/wishList" class="pr-2">
             <svg xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 576 512"
                 class="h-5 w-5"
@@ -64,7 +84,7 @@
             <div class="card-body">
               <span class="text-lg font-bold">8 Items</span>
               <span class="text-info">Subtotal: $999</span>
-              <NuxtLink :to="`/cart`" class="card-actions">
+              <NuxtLink to="/customer/cart" class="card-actions">
                 <button class="btn btn-primary btn-block">View cart</button>
               </NuxtLink>
             </div>
@@ -82,13 +102,15 @@
             tabindex="0"
             class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
             <li>
-              <NuxtLink :to="`/profile`" class="justify-between">
+              <NuxtLink to="/customer/profile" class="justify-between">
                 Profile
                 <span class="badge">New</span>
               </NuxtLink>
             </li>
             <li><a>Settings</a></li>
-            <li><NuxtLink :to="`/login`">Logout</NuxtLink></li>
+            <button @click="logoutUser" class="bg-red-500 text-white px-4 py-2 rounded">
+                Logout
+            </button>
           </ul>
         </div>
       </div>
