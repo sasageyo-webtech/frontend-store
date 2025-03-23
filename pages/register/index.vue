@@ -3,6 +3,7 @@
     import { useRouter } from 'vue-router'
     import { register } from '@api/auth'
 
+
     const router = useRouter()
     const username = ref('')
     const email = ref('')
@@ -67,6 +68,11 @@
             loading.value = false
         }
     }
+
+    definePageMeta({
+    layout: 'empty',
+    })
+
 </script>
 
 <template>
@@ -120,7 +126,7 @@
                 </button>
 
                 <div class="flex justify-center">
-                    <textarea v-if="errorMessage" class="mt-2 text-red-500 text-sm w-full hfull">{{ errorMessage }}</textarea>
+                    <textarea v-if="errorMessage" class="mt-2 text-red-500 text-sm w-full hfull"> {{ errorMessage }}</textarea>
                 </div>
             </form>
         </div>

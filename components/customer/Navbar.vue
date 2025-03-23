@@ -17,7 +17,7 @@
                 <details>
                     <summary class="text-white">Product</summary>
                     <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
-                        <li><NuxtLink to="/products">All products</NuxtLink></li>
+                        <li><NuxtLink to="/product">All products</NuxtLink></li>
                         <ul>
                             <li><NuxtLink>Category 1</NuxtLink></li>
                             <li><NuxtLink>Category 2</NuxtLink></li>

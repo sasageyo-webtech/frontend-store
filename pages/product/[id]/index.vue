@@ -1,7 +1,7 @@
 <template>
 <div>
 
-    <NuxtLink :to="`/products`" class="flex mx-20 mt-5">
+    <NuxtLink :to="`/product`" class="flex mx-20 mt-5">
         <svgLess></svgLess>
         <span>Back</span>
     </NuxtLink>

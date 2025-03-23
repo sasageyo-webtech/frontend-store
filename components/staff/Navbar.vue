@@ -3,7 +3,7 @@
 
 
       <div class="flex-1 gap-5">
-        <NuxtLink class="btn btn-ghost text-xl text-white" to="/">SAsaGEYO</NuxtLink>
+        <NuxtLink class="btn btn-ghost text-xl text-white" to="/staff">SAsaGEYO</NuxtLink>
         <div class="flex gap-2">
           <svgLocation></svgLocation>
           <img src="/img/flag.png">
@@ -14,7 +14,11 @@
 
       
 
-      <div class="flex-none pr-7 ml-auto">
+      <div class="flex-none pr-7 ml-auto space-x-10">
+
+        <NuxtLink to="/">             
+        <button class="btn btn-secondary"> Go to Customer's Website </button>
+        </NuxtLink>
 
         <div class="dropdown dropdown-end">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
@@ -28,7 +32,7 @@
             tabindex="0"
             class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
             <li>
-              <NuxtLink :to="`/profile/staff`" class="justify-between">
+              <NuxtLink to="/staff/profile" class="justify-between">
                 Profile
                 <span class="badge">New</span>
               </NuxtLink>

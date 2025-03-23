@@ -4,7 +4,7 @@
        
        
         <div class="flex justify-center p-7">
-            <NuxtLink :to="`/products`" class="btn btn-primary rounded-[50px] text-[15px] px-10 py-5 place-content-center">See all products</NuxtLink>
+            <NuxtLink :to="`/product`" class="btn btn-primary rounded-[50px] text-[15px] px-10 py-5 place-content-center">See all products</NuxtLink>
         </div>
 
         <div class="pb-20">
