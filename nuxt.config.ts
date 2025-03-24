@@ -20,5 +20,13 @@ export default defineNuxtConfig({
     '@api': '/api'  // Update this path to point to your actual API folder
   },
 
-  compatibilityDate: "2025-02-22"
+  compatibilityDate: "2025-02-22",
+
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost',
+    }
+  }
+
+  
 })

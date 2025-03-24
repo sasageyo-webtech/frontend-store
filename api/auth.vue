@@ -4,6 +4,7 @@
     const apiClient = axios.create({
         baseURL: 'http://localhost/api',
         headers: {
+            "Accept" : 'application/json',
             'Content-Type': 'application/json',
         }
     });
@@ -32,11 +33,13 @@
         }
     }
 
-    export const register = async (name, email, phone_number, image_path, password, password_confirmation) => {
+    export const register = async (username, email, firstname, lastname, gender, password, confirm_password) => {
         try {
             const response = await apiClient.post('/users/register', {
-                name, email, phone_number, image_path, password, password_confirmation
+                username, email, firstname, lastname, gender, password, confirm_password
             });
+            
+
             return response;
         } catch (error) {
             throw error.response ? error.response.data : error;
