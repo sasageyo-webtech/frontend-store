@@ -52,7 +52,7 @@
                             <UpdateAmount></UpdateAmount>
                     </td>
                     <th>
-                        <span class="badge badge-primary badge-m">189 ฿</span>
+                        <div class="badge badge-outline badge-ghost">189 ฿</div>
                     </th>
                 </tr>
 
@@ -93,7 +93,7 @@
                             <UpdateAmount></UpdateAmount>
                     </td>
                     <th>
-                        <span class="badge badge-primary badge-m">189 ฿</span>
+                        <div class="badge badge-outline badge-ghost">189 ฿</div>
                     </th>
                 </tr>
                 <!-- row 3 -->
@@ -130,7 +130,7 @@
                             <UpdateAmount></UpdateAmount>
                     </td>
                     <th>
-                        <span class="badge badge-primary badge-m">189 ฿</span>
+                        <div class="badge badge-outline badge-ghost">189 ฿</div>
                     </th>
                 </tr>
                 <!-- row 4 -->
@@ -167,7 +167,7 @@
                             <UpdateAmount></UpdateAmount>
                     </td>
                     <th>
-                        <span class="badge badge-primary badge-m">189 ฿</span>
+                        <div class="badge badge-outline badge-ghost">189 ฿</div>
                     </th>
                 </tr>
                 </tbody>
@@ -180,15 +180,15 @@
                     <th></th>
                     <th class="">
                         <div class="pb-3">Total Price </div>
-                        <span class="badge badge-secondary badge-lg">189 ฿</span>
+                        <div class="badge badge-soft badge-success text-white">756 ฿</div>
                         <NuxtLink to="/customer/checkout">
                         <div class="pt-5">
-                        <button class="btn btn-info text-white">Checkout</button>
+                        <button class="btn bg-blue-700 hover:bg-blue-900 text-white rounded-badge">Checkout</button>
                         </div>
                         </NuxtLink>
                     </th>
                 </tr>
-                </tfoot>
+                </tfoot> 
             </table>
 
 
