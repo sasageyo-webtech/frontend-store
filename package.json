@@ -10,6 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/auth": "^4.9.1",
+    "@nuxtjs/axios": "^5.13.6",
     "@vueuse/nuxt": "^12.7.0",
     "axios": "^1.8.4",
     "daisyui": "^4.12.23",

@@ -1,9 +1,14 @@
 <template>
-    <div>
-      <customerNavbar></customerNavbar>
-    <main>
+  <div class="flex flex-col min-h-screen">
+    <!-- Navbar -->
+    <customerNavbar></customerNavbar>
+
+    <!-- Content -->
+    <main class="flex-grow">
       <slot></slot>
-    </main>  
-    </div>
-    
+    </main>
+
+    <!-- Footer -->
+    <customerFooter></customerFooter>
+  </div>
 </template>
