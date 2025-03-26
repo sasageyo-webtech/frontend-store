@@ -1,26 +1,28 @@
 <script setup>
 
     const router = useRouter()
-    const username = ref('test5')
-    const email = ref('test5@gmail.com')
-    const firstname = ref('d')
-    const lastname = ref('d')
-    const gender = ref('d')
-    const password = ref('d')
-    const confirm_password = ref('d')
+    const username = ref('')
+    const email = ref('')
+    const firstname = ref('')
+    const lastname = ref('')
+    const gender = ref('')
+    const password = ref('')
+    const confirm_password = ref('')
 
     const errorMessage = ref('')
     const loading = ref(false)
 
     const registerUser = async () => {
-
+        //Check input is field
         checkInputError()
+
 
         try {
             loading.value = true
-            const {error ,response} = await useAPIFetch("/users/register", {
+            const {data, error} = await useAPIFetch("/users/register", {
                 method: 'post',
                 accept: 'application/json',
+                content_type: 'application/json',
                 
                 body: {
                     username,
@@ -41,13 +43,9 @@
             // localStorage.setItem('user', JSON.stringify(response.data.user))
             // router.push('/auth/login')
         } catch (error) {
-            if (error.response) {
-                errorMessage.value = error.response.data.message || 'Registration failed.'
-            } else if (error.request) {
+            if (error.request) {
                 errorMessage.value = 'Network error. Please try again later.'
-            } else {
-                errorMessage.value = error.message
-            }
+            } else errorMessage.value = error.message
         } finally {
             loading.value = false
         }
@@ -90,6 +88,22 @@
                 <div class="mt-3">
                     <label class="block text-gray-700">Email</label>
                     <input v-model="email" type="email" placeholder="Enter your email"
+                        class="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-300">
+                </div>
+
+                <div class="mt-3">
+                    <label class="block text-gray-700">First Name</label>
+                    <input v-model="firstname" type="text" placeholder="Enter your firstname"
+                        class="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-300">
+                </div>
+                <div class="mt-3">
+                    <label class="block text-gray-700">Last Name</label>
+                    <input v-model="lastname" type="text" placeholder="Enter your lastname"
+                        class="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-300">
+                </div>
+                <div class="mt-3">
+                    <label class="block text-gray-700">Gender</label>
+                    <input v-model="gender" type="text" placeholder="Enter your gender"
                         class="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-300">
                 </div>
 
