@@ -15,13 +15,13 @@
             <div 
 
                 class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg" 
-                v-for="(product, index) in data.products" 
+                v-for="(product, index) in products" 
                 :key="index">
 
                 <NuxtLink :to="`/customer/product/${product.id}`">
 
                     <figure class="flex justify-center p-4">
-                        <img :src="product.thumbnail" class="max-w-full h-40 object-contain" />
+                        <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />
                     </figure>
 
                     <div class="card-body">
@@ -53,6 +53,9 @@
 
 
 <script setup>
+import axios from 'axios';
+
+const products = ref([])
 
 useHead({
     title: "All product",
@@ -61,7 +64,18 @@ useHead({
     ]
 })
 
-const { data: data } = await useFetch('https://dummyjson.com/products?limit=10')
-console.log(data)
+const fetchProducts = async () => {
+    try {
+        const response = await axios.get('http://localhost/api/products');
+        products.value = response.data.data;
+
+        console.log(products.value)
+
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+};
+
+onMounted(fetchProducts)
 
 </script>
