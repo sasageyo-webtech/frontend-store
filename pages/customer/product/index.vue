@@ -1,5 +1,5 @@
 <template>
-    <div class="p-8">
+    <div class="p-10">
         <div class="flex justify-between">
             <strong class="text-xl font-semibold align-baseline">All Products</strong>
             <Searchbar></Searchbar>
@@ -11,7 +11,7 @@
                 <customerSidebar></customerSidebar>
             </div>
 
-           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+           <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
             <div 
 
                 class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg" 
@@ -25,8 +25,10 @@
                     </figure>
 
                     <div class="card-body">
+                        
                         <p class="card-title text-lg font-bold">{{ product.title }}</p>
                         <p class="text-base text-blue-800"> {{ product.brand }}</p>
+            
                         <div class="flex place-content-between">
                             <div class=""> {{ product.price }} ฿</div>
                             <div class="card-actions">
@@ -38,7 +40,10 @@
 
                 </NuxtLink>
             </div>
+            <!-- <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination> -->
             </div> 
+
+            
         </div>
         
 
