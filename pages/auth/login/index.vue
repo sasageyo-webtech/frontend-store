@@ -21,7 +21,7 @@
         const response = await login(email.value, password.value)
         localStorage.setItem('authToken', response.token)
         localStorage.setItem('user', JSON.stringify(response.user))
-        router.push('customer/product')
+        router.push('/auth/login/loginComplete')
     } catch (error) {
         errorMessage.value = error.message
     } finally {
