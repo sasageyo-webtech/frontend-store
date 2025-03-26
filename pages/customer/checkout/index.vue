@@ -110,9 +110,7 @@
                 <div class="relative card card-compact bg-base-100 shadow-xl p-6 rounded-xl">
                         <div class="flex flex-col gap-3">
                             <h1 class="card-title font-bold text-lg text-primary flex items-center">
-                            <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-blue-600">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 22s-8-4.4-8-10a8 8 0 1 1 16 0c0 5.6-8 10-8 10z" />
-                            </svg> -->
+
                             Address Information
 
                             <SvgEdit></SvgEdit>
@@ -151,8 +149,14 @@
                         ✏️ Detail Address: Apartment 5B, Near Central Park -->
                 
                         <div class="flex space-x-2 pt-4">
-                            <button class="btn btn-outline btn-info">Add new address</button>
-                            <button class="btn btn-outline btn-info">Change address</button>
+
+                            <NuxtLink to="/customer/address/checkout/create">
+                               <button class="btn btn-outline btn-info">Add new address</button> 
+                            </NuxtLink>
+                            <NuxtLink to="/customer/address/checkout">
+                               <button class="btn btn-outline btn-info">Change address</button> 
+                            </NuxtLink>
+                            
                         </div>
                         
                 </div>

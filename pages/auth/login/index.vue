@@ -28,10 +28,6 @@
         loading.value = false
     }
 }
-
-definePageMeta({
-    layout: 'empty',
-    })
     
 </script>
 
