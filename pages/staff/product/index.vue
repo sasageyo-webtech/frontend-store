@@ -1,130 +1,282 @@
 <script setup>
-    import { ref, onMounted } from 'vue'
-    import axios from 'axios'
+    import { ref, onMounted } from 'vue';
+    import axios from 'axios';
+    import { toRaw } from "vue";
 
     definePageMeta({
         layout: 'staff',
-    })
+    });
 
     const products = ref([])
-    const newProduct = ref({
-        name: '',
-        description: '',
-        price: '',
-        stock: 0,
-        category_id: '',
-        brand_id: '',
-        image_paths: '',
-        rating: 0,
-        accessibility: 'PUBLIC',
-    })
+    const categories = ref([])
+    const newCategory = ref('')
+    // const brands = ref([])
+    // const newBrand = ref('')
+    const selectedFiles = ref([])
+    const selectedProduct = ref(null);
     const loading = ref(false)
     const errorMessage = ref('')
-
-    // Base API URL (Change this if needed)
     const API_BASE = 'http://localhost/api/products'
+    const CATEGORY_API_BASE = 'http://localhost/api/categories'
+    // const BRAND_API_BASE = 'http://localhost/api/brands'
 
-    // Fetch products from API using axios
     const fetchProducts = async () => {
-        loading.value = true
-        errorMessage.value = ''
+        loading.value = true;
+        errorMessage.value = '';
         try {
-            const response = await axios.get(API_BASE)
-            products.value = response.data
+            const response = await axios.get(API_BASE);
+            
+            // Ensure we're accessing the correct array
+            if (response.data.data) {
+                console.log(response.data)
+                console.log(response.data.data)
+                products.value = response.data.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else {
+                console.error('Fetched data is not an array:', response.data);
+                errorMessage.value = 'Failed to fetch products: Invalid data format.';
+                products.value = [];
+            }
         } catch (error) {
-            console.error('Fetch Error:', error.message)
-            errorMessage.value = error.message
-            products.value = [] // Ensure it's always an array
+            console.error('Fetch Error:', error.message);
+            errorMessage.value = error.message;
+            products.value = [];
         } finally {
-            loading.value = false
+            loading.value = false;
         }
-    }
+    };
 
-    // Create a new product using axios
-    const createProduct = async () => {
-        if (!newProduct.value.name.trim() || !newProduct.value.price || !newProduct.value.category_id || !newProduct.value.brand_id) {
-            errorMessage.value = 'Please fill in required fields.'
+
+
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(CATEGORY_API_BASE);
+            categories.value = response.data.data;
+            console.log("Fetched Categories:", categories.value); // Debugging
+        } catch (error) {
+            console.error('Category Fetch Error:', error.message);
+            errorMessage.value = 'Failed to fetch categories.';
+        }
+    };
+
+
+    // const fetchBrands = async () => {
+    //     try {
+    //         const response = await axios.get(BRAND_API_BASE)
+    //         brands.value = response.data
+    //     } catch (error) {
+    //         console.error('Category Fetch Error:', error.message)
+    //         errorMessage.value = 'Failed to fetch brands.'
+    //     }
+    // }
+
+    const createCategory = async () => {
+        if (!newCategory.value.trim()) {
+            errorMessage.value = 'Please enter a category name.'
             return
         }
 
         try {
-            const response = await axios.post(API_BASE, {
-                ...newProduct.value,
-                image_paths: newProduct.value.image_paths ? newProduct.value.image_paths.split(',') : [],
-            })
+            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
             if (response.status === 201) {
                 location.href = location.href
-                products.value.push(response.data) // Add new product to the list
-                newProduct.value = { name: '', description: '', price: '', stock: 0, category_id: '', brand_id: '', image_paths: '', rating: 0, accessibility: 'PUBLIC' } // Reset form
-            } else {
-                errorMessage.value = response.data.message || 'Failed to create product.'
+                categories.value.push(response.data)
+                newCategory.value = ''
             }
         } catch (error) {
-            console.error('Create Error:', error.message)
-            errorMessage.value = error.message
+            console.error('Create Category Error:', error.message)
+            errorMessage.value = 'Failed to create category.'
         }
     }
 
-    // Delete a product using axios
+    // const createBrand = async () => {
+    //     if (!newBrand.value.trim()) {
+    //         errorMessage.value = 'Please enter a Brand name.'
+    //         return
+    //     }
+
+    //     try {
+    //         const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
+    //         if (response.status === 201) { 
+    //             location.href = location.href     
+    //             brands.value.push(response.data)
+    //             newBrand.value = ''
+    //         }
+    //     } catch (error) {
+    //         console.error('Create Brand Error:', error.message)
+    //         errorMessage.value = 'Failed to create Brand.'
+    //     }
+    // }
+
+    // const handleImageUpload = (event) => {
+    //     selectedFiles.value = Array.from(event.target.files).map(file => {
+    //         // Generate a URL for the image file to display it
+    //         return URL.createObjectURL(file);
+    //     });
+    // };    
+    const handleImageUpload = (event) => {
+        selectedFiles.value = Array.from(event.target.files);
+    }
+
+    const selectProduct = (product) => {
+        selectedProduct.value = { ...product };
+        console.log("Selected Product:", selectedProduct.value);
+        console.log("TEST TEST TEST: ", selectedProduct.value.category.name)
+    };
+
+
+    const updateProduct = async () => {
+    if (!selectedProduct.value) return;
+
+    try {
+        const response = await axios.put(`${API_BASE}/${selectedProduct.value.id}`, selectedProduct.value);
+
+        if (response.status === 200) {
+            location.href = location.href;  // Refresh the page
+            fetchProducts();
+            selectedProduct.value = null;  // Clear selected product after successful update
+        } else {
+            errorMessage.value = 'Failed to update product.';
+        }
+    } catch (error) {
+        console.error('Update Error:', error.message);
+        errorMessage.value = error.message;
+    }
+};
+
+
     const deleteProduct = async (id) => {
         try {
-            const response = await axios.delete(`${API_BASE}/${id}`)
+            const response = await axios.delete(`${API_BASE}/${id}`);
             if (response.status === 200) {
                 location.href = location.href
-                products.value = products.value.filter(p => p.id !== id)
+                products.value = products.value.filter(p => p.id !== id);
+                if (selectedProduct.value && selectedProduct.value.id === id) {
+                    selectedProduct.value = null;
+                }
             } else {
-                errorMessage.value = 'Failed to delete product.'
+                errorMessage.value = 'Failed to delete product.';
             }
         } catch (error) {
-            console.error('Delete Error:', error.message)
-            errorMessage.value = error.message
+            console.error('Delete Error:', error.message);
+            errorMessage.value = error.message;
         }
-    }
+    };
 
-    onMounted(fetchProducts)
+    onMounted(() => {
+        fetchProducts()
+        fetchCategories()
+    })
 </script>
 
 <template>
-    <div class="mx-auto p-10">
-        <h1 class="text-2xl font-bold mb-4">Product List</h1>
-
-        <!-- <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div> -->
-
-        <div class="flex gap-32">
-            <div class="w-2/3">
-                <div v-if="loading" class="text-gray-500">Loading products...</div>
-                <ul v-else class="space-y-2">
-                    <li v-for="product in products" :key="product.id" class="flex flex-col justify-between p-2 border rounded">
-                        <li v-for="prod in product" class="flex justify-between p-2 border rounded">
+    <div class="mt-10 mx-16 flex gap-10">
+        <div class="w-1/2">
+            <h1 class="text-2xl font-bold mb-4">Product List</h1>
+            <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+            <div v-if="loading" class="text-gray-500">Loading products...</div>
+            <ul v-else> 
+                <!-- <li v-for="product in products" :key="product.id" class="flex flex-col justify-between p-2 px-3 border border-[rgba(0,0,0,0.2)] rounded"> -->
+                    <li v-for="prod in products" @click="selectProduct(prod)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-[rgba(0,0,0,0.1)] shadow-xl rounded">
+                        <div class="flex items-center">
+                            <img :src="prod.image_paths[0]" alt="Product Image" class="w-16 h-16 object-cover mr-4 rounded" />
                             <div>
-                                <span class="font-bold">{{ prod.name }}</span> - ${{ prod.price }} (Stock: {{ prod.stock }})
+                                <span class="font-bold">{{ prod.name }}</span> : ${{ prod.price }} (Stock: {{ prod.stock }})
                             </div>
-                            <button @click="deleteProduct(prod.id)" class="bg-red-500 text-white p-1 rounded">Delete</button>
-                        </li>
+                        </div>
+                        
+                        <div class="flex gap-6">
+                            <!-- <button @click="editProduct(prod.id)" class="bg-blue-500 text-white p-1 px-4 rounded">Edit</button> -->
+                            <button @click="deleteProduct(prod.id)" class="bg-red-500 text-white p-1 px-4 rounded">Delete</button>
+                        </div>
                     </li>
-                </ul>
-            </div>
+                <!-- </li> -->
+            </ul>
+        </div>
+        
+        <div v-if="selectedProduct" class="w-1/2 p-6 mt-12 border border-gray-300 rounded shadow-md">
+            <h2 class="text-xl font-bold mb-4">Edit Product</h2>
+            
+            <div class="p-4 space-y-2">
+                <p class="font-bold">Product name :</p>
+                <input v-model="selectedProduct.name" type="text" class="border p-2 rounded w-full" required />
+                
+                <p class="font-bold">Description :</p>
+                <textarea v-model="selectedProduct.description" class="border p-2 rounded w-full"></textarea>
+                
+                <p class="font-bold">Price :</p>
+                <input v-model="selectedProduct.price" type="number" class="border p-2 rounded w-full" required />
+                
+                <!-- CATEGORY -->
+                <div class="flex gap-2">
+                    <p class="font-bold">Category :</p> 
+                    <p> {{ selectedProduct.category.name }}</p>
+                </div>
+                <select v-model="selectedProduct.category_id" class="border p-2 rounded w-full" required>
+                    <!-- <li v-for="category in categories" :key="category.id" :value="category.id"> -->
+                        <!-- <option value="" selected>{{ selectedProduct.category.name }}</option> -->
+                        <option v-for="cate in categories" :key="cate.id" :value="cate.id">
+                            {{ cate.name }}
+                        </option>
+                    <!-- </li> -->
+                </select>
+                <div class="mt-2">
+                    <input v-model="newCategory" type="text" placeholder="Add New Category Name" class="border p-2 rounded w-full" />
+                    <button @click.prevent="createCategory" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Category</button>
+                </div>
 
-            <form @submit.prevent="createProduct" class="mb-4 space-y-2 w-2/3">
-                <h1 class="text-xl font-bold mb-4">Create New Product</h1>
+                <!-- BRAND -->
+                <!-- <p class="font-bold">Brand :</p>
+                <select v-model="selectedProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
+                    <li v-for="brand in brands" :key="brand.id" :value="brand.id">
+                        <option value="" disabled selected>Select a Brand</option>
+                        <option v-for="b in brand" :key="b.id" :value="b.id">
+                            {{ b.name }}
+                        </option>   
+                    </li>
+                </select>
+                <div class="mt-2">
+                    <input v-model="newBrand" type="text" placeholder="Add New Brand Name" class="border p-2 rounded w-full" />
+                    <button @click.prevent="createBrand" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Brand</button>
+                </div> -->
 
-                <input v-model="newProduct.name" type="text" placeholder="Product Name" class="border p-2 rounded w-full" required />
-                <textarea v-model="newProduct.description" placeholder="Description (optional)" class="border p-2 rounded w-full"></textarea>
-                <input v-model="newProduct.price" type="number" placeholder="Price" class="border p-2 rounded w-full" required />
-                <input v-model="newProduct.stock" type="number" placeholder="Stock" class="border p-2 rounded w-full" />
-                <input v-model="newProduct.category_id" type="text" placeholder="Category ID" class="border p-2 rounded w-full" required />
-                <input v-model="newProduct.brand_id" type="text" placeholder="Brand ID" class="border p-2 rounded w-full" required />
-                <input v-model="newProduct.image_paths" type="text" placeholder="Image Paths (comma-separated)" class="border p-2 rounded w-full" />
-                <input v-model="newProduct.rating" type="number" placeholder="Rating" class="border p-2 rounded w-full" />
+                <p class="font-bold">Picture :</p>
+                <div v-if="selectedProduct.image_paths.length > 0" class="mt-4">
+                    <p class="mb-2">Preview Images:</p>
+                    <div class="flex gap-10">
+                        <div v-for="(file, index) in selectedProduct.image_paths" :key="index" class="w-24 h-24">
+                            <img :src="file" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
+                        </div>
+                    </div>
+                </div>
 
-                <select v-model="newProduct.accessibility" class="border p-2 rounded w-full">
+                <div class="relative border border-black border-1 rounded-md p-2 pt-3 w-fit">
+                    <input type="file" multiple @change="handleImageUpload" id="image-upload"/>
+                    <label for="image-upload" class="py-2 px-5 bg-blue-500 text-white text-sm rounded-lg text-lg hover:bg-blue-600">
+                        Choose Image(s)
+                    </label>
+                </div>
+
+                <div v-if="selectedFiles.length > 0" class="mt-4">
+                    <p class="mb-2">Preview Images:</p>
+                    <div class="flex gap-10">
+                        <div v-for="(file, index) in selectedFiles" :key="index" class="w-24 h-24">
+                            <img :src="file" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
+                        </div>
+                    </div>
+                </div>
+
+                <p class="font-bold">Privacy :</p>
+                <select v-model="selectedProduct.accessibility" class="border p-2 rounded w-full">
                     <option value="PUBLIC">Public</option>
                     <option value="PRIVATE">Private</option>
                 </select>
+            </div>
 
-                <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full">Add Product</button>
-            </form>
+            <button @click="updateProduct" class="bg-blue-500 text-white p-2 rounded w-full mt-4">Save Changes</button>
         </div>
-
     </div>
 </template>
+
+<style lang="scss" scoped>
+</style>
