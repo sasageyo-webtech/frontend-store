@@ -17,6 +17,11 @@
 </template>
 
 <script setup>
+
+// definePageMeta({
+//         layout: 'guest',
+//     });
+
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 

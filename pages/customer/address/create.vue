@@ -1,6 +1,6 @@
 <template>
     <div>
-        <NuxtLink to="/customer/address/checkout" class="flex mx-20 mt-5">
+        <NuxtLink to="/customer/address/" class="flex mx-20 mt-5">
             <svgLess></svgLess>
             <span>Back</span>
         </NuxtLink>
@@ -68,7 +68,7 @@
                         <input type="text" class="input input-bordered w-full" placeholder="Enter additional details (if any)" />
                     </div>
                     
-                    <NuxtLink :to="`/customer/address/checkout`">
+                    <NuxtLink :to="`/customer/address/`">
                        <button type="submit" class="btn btn-primary w-full">Save</button> 
                     </NuxtLink>
                     

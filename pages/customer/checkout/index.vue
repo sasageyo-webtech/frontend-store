@@ -10,8 +10,11 @@
         <div class="grid grid-cols-2 space-x-2 mx-20">
 
 
-            <!-- checkout left-->
+     
             <div class="card card-body bg-slate-100 p-6">
+                
+
+             <!-- checkout left-->   
                 <div class="card card-body bg-slate-100 p-6 flex flex-col min-h-full">
                     <div class="overflow-x-auto flex-grow">
                         <table class="table">
@@ -113,7 +116,7 @@
 
                             Address Information
 
-                            <SvgEdit></SvgEdit>
+                            <!-- <SvgEdit></SvgEdit> -->
 
                             </h1>
 

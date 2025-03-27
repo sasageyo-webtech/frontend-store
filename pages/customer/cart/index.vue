@@ -25,6 +25,7 @@
                         <SvgDelete></SvgDelete>
                     </button>
                     </th>
+
                     <td>
                         <div class="flex items-center gap-3">
                         <div class="avatar">
@@ -40,17 +41,20 @@
                         </div>
                     </div>
                     </td>
+
                     <td>
                     <!-- Zemlak, Daniel and Leannon
                     <br /> -->
                     <span class="badge badge-ghost badge-m">189 ฿</span>
                     </td>
+
                     <td>
                         <!-- <input type="number" class="input validator" required placeholder="1" 
                             min="1" max="100" /> -->
 
                             <UpdateAmount></UpdateAmount>
                     </td>
+                    
                     <th>
                         <div class="badge badge-outline badge-ghost">189 ฿</div>
                     </th>
