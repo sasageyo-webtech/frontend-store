@@ -1,6 +1,7 @@
 <script setup>
     import { ref, onMounted } from 'vue';
     import axios from 'axios';
+    import Report from '@/components/staff/modals/Report.vue';
 
     definePageMeta({ layout: 'staff' });
 
@@ -49,7 +50,7 @@
     const fetchCategories = async () => {
         try {
             const response = await axios.get(CATEGORY_API_BASE);
-            categories.value = response.data;
+            categories.value = response.data.data;
         } catch (error) {
             console.error('Category Fetch Error:', error.message);
             errorMessage.value = 'Failed to fetch categories.';
@@ -147,20 +148,22 @@
         <input v-model="newProduct.price" type="number" placeholder="price" class="border p-2 rounded w-full" required />
         
         <!-- CATEGORY -->
-        <p class="font-bold">Category :</p>
+        <div class="flex gap-2">
+            <p class="font-bold">Category :</p> 
+        </div>
         <select v-model="newProduct.category_id" class="border p-2 rounded w-full" required>
-            <li v-for="category in categories" :key="category.id" :value="category.id">
+            <!-- <li v-for="category in categories" :key="category.id" :value="category.id"> -->
                 <option value="" disabled selected>select a category</option>
-                <option v-for="cate in category" :key="cate.id" :value="cate.id">
+                <option v-for="cate in categories" :key="cate.id" :value="cate.id">
                     {{ cate.name }}
-                </option>   
-            </li>
+                </option>
+            <!-- </li> -->
         </select>
         <div class="mt-2">
             <input v-model="newCategory" type="text" placeholder="add new category name" class="border p-2 rounded w-full" />
-            <button @click.prevent="createCategory" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Category</button>
+            <button @click.prevent="createCategory" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Category</button>
         </div>
-
+        
         <!-- BRAND -->
         <p class="font-bold">Brand :</p>
         <select v-model="newProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
@@ -173,7 +176,7 @@
         </select>
         <div class="mt-2">
             <input v-model="newBrand" type="text" placeholder="add new brand name" class="border p-2 rounded w-full" />
-            <button @click.prevent="createBrand" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Brand</button>
+            <button @click.prevent="createBrand" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Brand</button>
         </div>
 
         <div v-if="selectedFiles.length > 0" class="mt-4">

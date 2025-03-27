@@ -11,7 +11,7 @@
     const showSuccessCreateCategory = ref(false);
     const showSuccessCreateBrand = ref(false);
     const showSuccessUpdateProduct = ref(false);
-    const showSuccessDeleteBrand = ref(false);
+    const showSuccessDeleteProduct = ref(false);
     const products = ref([])
     const categories = ref([])
     const newCategory = ref('')
@@ -205,7 +205,7 @@
         <div class="w-1/2">
             <h1 class="text-2xl font-bold mb-4">Product List</h1>
 
-            <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+            <!-- <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div> -->
 
             <div v-if="loading" class="text-gray-500">Loading products...</div>
             <ul v-else> 
@@ -276,7 +276,7 @@
                     <!-- </li> -->
                 </select>
                 <div class="mt-2">
-                    <input v-model="newCategory" type="text" placeholder="Add New Category Name" class="border p-2 rounded w-full" />
+                    <input v-model="newCategory" type="text" placeholder="add new category name" class="border p-2 rounded w-full" />
                     <button @click.prevent="createCategory" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Category</button>
                 </div>
 
@@ -291,7 +291,7 @@
                     </li>
                 </select>
                 <div class="mt-2">
-                    <input v-model="newBrand" type="text" placeholder="Add New Brand Name" class="border p-2 rounded w-full" />
+                    <input v-model="newBrand" type="text" placeholder="add new brand name" class="border p-2 rounded w-full" />
                     <button @click.prevent="createBrand" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Brand</button>
                 </div>
 
@@ -330,10 +330,10 @@
             @close="showSuccessUpdateProduct = false" 
         />
         <Report 
-            :show="showSuccessDeleteBrand" 
+            :show="showSuccessDeleteProduct" 
             title="Delete Product Completed" 
             buttonText="Got it!" 
-            @close="showSuccessDeleteBrand = false" 
+            @close="showSuccessDeleteProduct = false" 
         />
     </div>
 </template>
