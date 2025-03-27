@@ -26,8 +26,8 @@
 
                     <div class="card-body">
                         
-                        <p class="card-title text-lg font-bold">{{ product.title }}</p>
-                        <p class="text-base text-blue-800"> {{ product.brand }}</p>
+                        <p class="card-title text-lg font-bold">{{ product.name }}</p>
+                        <p class="text-base text-blue-800"> {{ product.brand.name }}</p>
             
                         <div class="flex place-content-between">
                             <div class=""> {{ product.price }} ฿</div>

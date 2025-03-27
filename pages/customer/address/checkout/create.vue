@@ -68,7 +68,10 @@
                         <input type="text" class="input input-bordered w-full" placeholder="Enter additional details (if any)" />
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-full">Save</button>
+                    <NuxtLink :to="`/customer/address/checkout`">
+                       <button type="submit" class="btn btn-primary w-full">Save</button> 
+                    </NuxtLink>
+                    
                 </form>
 </div>
 
