@@ -1,67 +1,86 @@
 <script setup>
-// const {id} = useRoute().params
-// const { data: product } = await useFetch('https://dummyjson.com/products/'+id)
+const userStore = useUser()
+const product = ref(null)
+const quantity = ref(1)
+const productImages = ref([]);
 
-const product = ref({})
+const increaseQuantity = () => {
+    if (quantity.value < product.value.stock) {
+        quantity.value++;
+    }
+};
+
+const decreaseQuantity = () => {
+    if (quantity.value > 1) {
+        quantity.value--;
+    }
+};
 
 const fetchProduct = async () => {
-
         const {product_id} = useRoute().params
-        console.log({product_id})
         try {
-            const response = await apiClient.get('/products/' + product_id);
-        
-            // console.log(response)
-
+            const response = await apiClient.get(`/products/${product_id}`);
             product.value = response.data.data
+        // ตรวจสอบข้อมูลที่ได้    
+        console.log('Product:', product.value);
+        console.log('Product Name:', product.value.name);
+        console.log('Product Brand:', product.value.brand?.name);
+        console.log('Product Images:', product.value.image_products)
 
+        // ดึงเฉพาะรูปภาพของสินค้า
+        productImages.value = product.value.image_products.map(img => img.image_path)
 
-            console.log(product.value.name)
-            console.log(product.value.brand.name)
-
-
+        console.log(productImages)
 
         } catch (error) {
             console.error('Error fetching products:', error);
         }
-
 }
 
-onMounted(fetchProduct)
+const addToCart = async () => {
+    console.log(userStore.userInfo.customer_id, product.value.id, quantity.value);
+    try {
+        const response = await apiClient.post(`/carts`, {
+            customer_id: userStore.userInfo.customer_id,
+            product_id: product.value.id,
+            amount: quantity.value
+        });
 
-const imageSet1 = [
-'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp',
-'https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp',
-'https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.webp'
-]
+        console.log('Response Status:', response.status);
+
+          // 🔄 รีโหลดข้อมูลสินค้าใหม่หลังจากเพิ่มลงตะกร้า
+        await fetchProduct(); 
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error.response?.data || error.message);
+    }
+};
+
+
+onMounted(async () => {
+    await userStore.loadUser()
+    await fetchProduct()
+})
+
+
 </script>
 
 <template>
     <div>
-    
         <NuxtLink to="/customer/product" class="flex mx-20 mt-5">
             <svgLess></svgLess>
             <span>Back</span>
         </NuxtLink>
-    
-    
-        
         <div class="grid grid-cols-[auto_1fr] gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg m-20">
-    
             <!-- image -->
             <div>
-                <Imageslidexs :images="imageSet1" />
+                <Imageslidexs v-if="productImages" :images="productImages" />
                 <!-- <img :src="product.thumbnail" class="w-full h-40 object-contain" /> -->
             </div>
-    
             <!-- content -->
             <div class="relative">
-         
-                    <p class="card-title text-lg font-bold">{{ product.value.name }}</p>
-                    <p class="text-base text-blue-800">{{ product.value.brand?.name }}</p>
-    
-
-
+                <p v-if="product" class="card-title text-lg font-bold">{{ product.name }}</p>
+                <p v-if="product" class="text-base text-blue-800">{{ product.brand.name }}</p>
                 <div class="flex py-5">
                       <div class="flex">
                         <SvgStar></SvgStar>  
@@ -76,27 +95,29 @@ const imageSet1 = [
                 </div>
          
 
-                <!-- <p class="text-sm text-gray-600 pb-4">{{ product.description }}</p> -->
+                <p v-if="product" class="text-sm text-gray-600 pb-4">{{ product.description }}</p>
     
-                <!-- <div><strong>{{ product.value.price }} ฿ </strong></div> -->
+                <div><strong v-if="product">{{ product.price }} ฿ </strong></div>
 
                 <div class="flex place-content-between items-center mt-4 absolute inset-x-0 bottom-0 h-16 ">
-    
                     <div class="grid grid-cols-3 gap-3 bg-gray-100 rounded-3xl py-2 px-10">
                         Quantity
                         <div class="flex gap-5">
-                            <button>-</button><div class="text-blue-500">4</div><button>+</button>
+                            <button @click="decreaseQuantity()">-</button>
+                            <div class="text-blue-500">{{ quantity }}</div>
+                            <button @click="increaseQuantity()">+</button>
                         </div>
+
                         <div class="flex gap-4">
-                            <div class="text-blue-500">200</div> <div>Pieces Avaliable</div>
+                            <div v-if="product" class="text-blue-500">{{ product.stock }}</div> <div>Pieces Avaliable</div>
                         </div>
                         
                     </div>
                     <div class="card-actions"> 
                         <svgHeart></svgHeart>
                     
-                        <button class="btn btn-primary text-[10px] rounded-[30px]">Add to Cart</button>
-                        <button class="btn btn-accent text-[10px] rounded-[30px]">Buy Now</button>
+                        <button @click="addToCart()" class="btn btn-primary text-[10px] rounded-[30px]">Add to Cart</button>
+                        <!-- <button class="btn btn-accent text-[10px] rounded-[30px]">Buy Now</button> -->
                     </div>
                 </div>
 
@@ -108,12 +129,12 @@ const imageSet1 = [
     
     <!-- reviews -->
     
-        <h1 class="mx-20 mb-10">Product Reviews</h1>
+        <!-- <h1 class="mx-20 mb-10">Product Reviews</h1>
         <div class="mb-20">
             <ProductReviews></ProductReviews>
             <ProductReviews></ProductReviews>
             <ProductReviews></ProductReviews>
-        </div>
+        </div> -->
     
         
     </div>
