@@ -1,4 +1,5 @@
 <script>
+
     import axios from 'axios';
 
     const apiClient = axios.create({
@@ -45,5 +46,4 @@
             throw error.response ? error.response.data : error;
         }
     };
-
 </script>

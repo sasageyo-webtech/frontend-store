@@ -24,7 +24,7 @@ const productImages = ref([]);
 
 const fetchProducts = async () => {
     try {
-        const response = await axios.get('http://localhost/api/products');
+        const response = await apiClient.get('/products');
         const products = response.data.data.slice(0, 5);
 
         // ดึงเฉพาะรูปภาพของสินค้าแต่ละรายการ
