@@ -1,5 +1,7 @@
 export interface User {
   user_id: number;
+  customer_id?: number;
+  staff_id? : number;
   username: string;
   firstname: string;
   lastname: string;
