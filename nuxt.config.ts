@@ -5,8 +5,13 @@ export default defineNuxtConfig({
 
   modules: [
     '@vueuse/nuxt',
-    "@nuxtjs/tailwindcss"
+    "@nuxtjs/tailwindcss",
+    '@pinia/nuxt'
   ],
+
+  pinia: {
+    storesDirs: ['./stores/**', './custom-folder/stores/**'],
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -26,7 +31,10 @@ export default defineNuxtConfig({
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost',
     }
-  }
+  },
+  plugins: [
+    '~/plugins/pinia.ts' // ลงทะเบียน plugin
+  ]
 
   
 })
