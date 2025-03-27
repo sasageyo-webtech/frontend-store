@@ -3,10 +3,7 @@ export default defineNuxtConfig({
 
   // pages: false,
 
-  modules: [
-    '@vueuse/nuxt',
-    "@nuxtjs/tailwindcss"
-  ],
+  modules: ['@vueuse/nuxt', "@nuxtjs/tailwindcss", '@pinia/nuxt'],
 
   css: ['~/assets/css/main.css'],
 
