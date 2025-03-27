@@ -5,7 +5,6 @@ const carts = ref([])
 const deleteCart = async (cart_id) => {
     const response = await apiClient.delete(`/carts/${cart_id}`)
     console.log(response.status)
-
 }
 
 onMounted( async ()=>{
