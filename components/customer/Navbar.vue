@@ -5,15 +5,16 @@
   const router = useRouter();
 
   const logoutUser = async () => {
-      try {
-          await logout();
-      } catch (error) {
-          console.error('Logout failed:', error);
-      } finally {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
-          router.push('/auth/login');
-      }
+    router.push('/auth/login')
+      // try {
+      //     await logout();
+      // } catch (error) {
+      //     console.error('Logout failed:', error);
+      // } finally {
+      //     localStorage.removeItem('authToken');
+      //     localStorage.removeItem('user');
+      //     router.push('/auth/login');
+      // }
   };
 </script>
 

@@ -18,7 +18,7 @@
                 v-for="(product, index) in products" 
                 :key="index">
 
-                <NuxtLink :to="`/customer/product/${product.id}`">
+                <NuxtLink :to="`/customer/product/${product.id}`"> 
 
                     <figure class="flex justify-center p-4">
                         <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />

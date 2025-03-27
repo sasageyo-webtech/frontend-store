@@ -1,3 +1,41 @@
+<script setup>
+// const {id} = useRoute().params
+// const { data: product } = await useFetch('https://dummyjson.com/products/'+id)
+
+const product = ref({})
+
+const fetchProduct = async () => {
+
+        const {product_id} = useRoute().params
+        console.log({product_id})
+        try {
+            const response = await apiClient.get('/products/' + product_id);
+        
+            // console.log(response)
+
+            product.value = response.data.data
+
+
+            console.log(product.value.name)
+            console.log(product.value.brand.name)
+
+
+
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+
+}
+
+onMounted(fetchProduct)
+
+const imageSet1 = [
+'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp',
+'https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp',
+'https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.webp'
+]
+</script>
+
 <template>
     <div>
     
@@ -7,7 +45,7 @@
         </NuxtLink>
     
     
-    
+        
         <div class="grid grid-cols-[auto_1fr] gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg m-20">
     
             <!-- image -->
@@ -18,9 +56,11 @@
     
             <!-- content -->
             <div class="relative">
+         
+                    <p class="card-title text-lg font-bold">{{ product.value.name }}</p>
+                    <p class="text-base text-blue-800">{{ product.value.brand?.name }}</p>
     
-                <p class="card-title text-lg font-bold">{{ product.title }}</p>
-                <p class="text-base text-blue-800"> {{ product.brand }}</p>
+
 
                 <div class="flex py-5">
                       <div class="flex">
@@ -36,9 +76,9 @@
                 </div>
          
 
-                <p class="text-sm text-gray-600 pb-4">{{ product.description }}</p>
+                <!-- <p class="text-sm text-gray-600 pb-4">{{ product.description }}</p> -->
     
-                <div><strong>{{ product.price }} ฿ </strong></div>
+                <!-- <div><strong>{{ product.value.price }} ฿ </strong></div> -->
 
                 <div class="flex place-content-between items-center mt-4 absolute inset-x-0 bottom-0 h-16 ">
     
@@ -80,16 +120,7 @@
     
     </template>
     
-    <script setup>
-    const {id} = useRoute().params
-    const { data: product } = await useFetch('https://dummyjson.com/products/'+id)
-
-    const imageSet1 = [
-    'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp',
-    'https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp',
-    'https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.webp'
-]
-    </script>
+ 
     
     <style scoped>
     
