@@ -28,7 +28,7 @@ const toggleProductMenu = () => {
                         </NuxtLink>
                     </li>
 
-                    <li>
+                    <!-- <li>
                         <NuxtLink to="/staff">
                             <div class="flex items-center p-2 rounded-lg text-black hover:bg-gray-200">
                                 <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 22 21">
@@ -38,7 +38,7 @@ const toggleProductMenu = () => {
                                 <span class="ms-3 text-gray-600">Dashboard</span>
                             </div>
                         </NuxtLink>
-                    </li>
+                    </li> -->
 
                     <li>
                         <button @click="toggleProductMenu" class="w-full text-left flex items-center p-2 rounded-lg text-black hover:bg-gray-200">
