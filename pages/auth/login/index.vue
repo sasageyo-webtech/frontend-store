@@ -1,15 +1,15 @@
 <script setup>
-    import { ref } from 'vue'
-    import { useRouter } from 'vue-router'
-    import { login } from '@api/auth'
+import { UserRole } from '~/types/users'
+import { useUser } from '~/stores/useUser'
 
-    const router = useRouter()
-    const email = ref('')
-    const password = ref('')
-    const errorMessage = ref('')
-    const loading = ref(false)
+const router = useRouter()
+const userStore = useUser()
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const loading = ref(false)
 
-    const loginUser = async () => {
+const loginUser = async () => {
     errorMessage.value = ''
     if (!email.value || !password.value) {
         errorMessage.value = 'Please enter both email and password.'
@@ -18,15 +18,29 @@
 
     try {
         loading.value = true
-        const response = await login(email.value, password.value)
-        localStorage.setItem('authToken', response.token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        router.push('/auth/login/loginComplete')
+        
+        const response = await apiClient.post('/users/login', {
+             email: email.value,
+             password: password.value 
+        });
+
+        if (response.status === 200) { // ตรวจสอบสถานะตอบกลับ
+            const user = response.data.data
+           
+            userStore.login(user)
+            
+            if(user.role == UserRole.CUSTOMER) router.push('/')
+            if(user.role == UserRole.STAFF) router.push('/staff')
+
+        } else {
+            errorMessage.value = 'Login failed. Please check your credentials.'
+        }
+
     } catch (error) {
         errorMessage.value = error.message
     } finally {
         loading.value = false
-    }
+}
 }
     
 </script>
