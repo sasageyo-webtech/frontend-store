@@ -1,3 +1,26 @@
+<script setup>
+    const userStore = useUser()
+    const addresses = ref([])
+
+    const deleteAddress = async (customer_address_id) => {
+        console.log(customer_address_id)
+        const response = await apiClient.delete(`/address-customer/${customer_address_id}`)
+        console.log(response.status)
+
+    }
+
+    onMounted( async ()=>{
+        await userStore.loadUser();
+
+        const addressesResponse = await apiClient.get(`/address-customers?customer_id=${5}`);
+        // console.log(userStore.userInfo.customer_id)
+        // console.log(addressesResponse.data)
+        addresses.value = addressesResponse.data.data
+
+        // console.log(addresses.value.name)
+    })
+
+</script>
 <template>
     <div>
 
@@ -18,18 +41,16 @@
                     <li v-for="(address, index) in addresses" :key="index" class="flex items-center justify-between py-3 border-t">
                         <div>
                             <div class="font-medium">{{ address.name }}</div>
-                            <div class="text-xs opacity-60">{{ address.details }}</div>
-                            <div class="text-xs text-gray-500">📍 {{ address.note }}</div>
-                            <div class="text-xs text-gray-500">📞 {{ address.phone }}</div>
+                            <div class="text-xs opacity-60">{{ address.phone_number }}</div>
+
+                            <div class="text-xs text-gray-500">📍 {{ address.house_number}}, {{ address.building }}</div>
+                            <div class="text-xs text-gray-500"> {{ address.street}}, {{ address.sub_district }}, {{ address.district}}</div>
+                            <div class="text-xs text-gray-500"> {{ address.province }}, {{ address.country }}, {{ address.district }}</div>
+                            <div class="text-xs text-gray-500">{{ address.detail_address}}</div>
                         </div>
                         <div class="flex items-center space-x-2">
   
-  
-                            <NuxtLink :to="`/customer/address/edit/`">
-                                <button class="btn btn-sm btn-warning">Edit</button>
-                            </NuxtLink>
-  
-                            <button @click="deleteAddress(index)" class="btn btn-sm btn-error">Delete</button>
+                            <button @click="deleteAddress(5)" class="btn btn-sm btn-error">Delete</button>
                         </div>
                     </li>
                 </ul>
@@ -37,27 +58,4 @@
         </div>
     </div>
   </template>
-  
-  <script>
-  export default {
-    data() {
-        return {
-            selectedIndex: null,
-            addresses: [
-                { name: "Jane Doe", details: "456, no1, Second St, Sub District, District, Province, Country, 54321", note: "Next to the school", phone: "0987654321" },
-                { name: "John Smith", details: "789, Tower B, Third Ave, Small Town, Big City, Province, Country, 65432", note: "Near the park", phone: "0912345678" },
-                { name: "Alice Wonderland", details: "123, Apt 5A, Wonderland St, Magic Town, Fantasy, Province, Country, 12345", note: "Beside the river", phone: "0876543210" }
-            ]
-        };
-    },
-    methods: {
-        deleteAddress(index) {
-            this.addresses.splice(index, 1);
-            if (this.selectedIndex === index) {
-                this.selectedIndex = null;
-            }
-        }
-    }
-  };
-  </script>
   
