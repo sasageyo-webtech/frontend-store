@@ -1,161 +1,134 @@
 <script setup>
-    import { ref } from 'vue';
+    import { ref, onMounted } from 'vue';
     import axios from 'axios';
 
-    definePageMeta({
-        layout: 'staff',
-        })
+    definePageMeta({ layout: 'staff' });
 
-        const loading = ref(false)
-        const products = ref([])
-        const categories = ref([])
-        const newCategory = ref('')
-        const brands = ref([])
-        const newBrand = ref('')
-        const newProduct = ref({
-            name: '',
-            description: '',
-            price: '',
-            stock: 0,
-            category_id: '',
-            brand_id: '',
-            image_paths: [],
-            rating: 0,
-            accessibility: 'PUBLIC',
-        })
-        const selectedFiles = ref([])
-        const errorMessage = ref('')
-        const API_BASE = 'http://localhost/api/products'
-        const CATEGORY_API_BASE = 'http://localhost/api/categories'
-        const BRAND_API_BASE = 'http://localhost/api/brands'
+    const loading = ref(false);
+    const products = ref([]);
+    const categories = ref([]);
+    const newCategory = ref('');
+    const brands = ref([]);
+    const newBrand = ref('');
+    const newProduct = ref({
+        name: '',
+        description: '',
+        price: '',
+        stock: 0,
+        category_id: '',
+        brand_id: '',
+        image_products: [],
+        rating: 0,
+        accessibility: 'PUBLIC',
+    });
+    const selectedFiles = ref([]);
+    const errorMessage = ref('');
+
+    const API_BASE = 'http://localhost/api/products';
+    const CATEGORY_API_BASE = 'http://localhost/api/categories';
+    const BRAND_API_BASE = 'http://localhost/api/brands';
+    // const IMAGE_UPLOAD_API = 'http://localhost/api/products/images';
 
     const fetchProducts = async () => {
-        loading.value = true
-        errorMessage.value = ''
+        loading.value = true;
+        errorMessage.value = '';
         try {
-            const response = await axios.get(API_BASE)
-            products.value = response.data
+            const response = await axios.get(API_BASE);
+            products.value = response.data.data;
         } catch (error) {
-            console.error('Fetch Error:', error.message)
-            errorMessage.value = error.message
-            products.value = []
+            console.error('Fetch Error:', error.message);
+            errorMessage.value = error.message;
+            products.value = [];
         } finally {
-            loading.value = false
+            loading.value = false;
         }
-    }
+    };
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(CATEGORY_API_BASE)
-            categories.value = response.data
+            const response = await axios.get(CATEGORY_API_BASE);
+            categories.value = response.data;
         } catch (error) {
-            console.error('Category Fetch Error:', error.message)
-            errorMessage.value = 'Failed to fetch categories.'
+            console.error('Category Fetch Error:', error.message);
+            errorMessage.value = 'Failed to fetch categories.';
         }
-    }
+    };
 
     const fetchBrands = async () => {
         try {
-            const response = await axios.get(BRAND_API_BASE)
-            brands.value = response.data
+            const response = await axios.get(BRAND_API_BASE);
+            brands.value = response.data;
         } catch (error) {
-            console.error('Category Fetch Error:', error.message)
-            errorMessage.value = 'Failed to fetch brands.'
+            console.error('Brand Fetch Error:', error.message);
+            errorMessage.value = 'Failed to fetch brands.';
         }
-    }
+    };
+
+    const uploadImages = async (id, file) => {
+        const imageObjects = [];
+
+        const formData = new FormData();
+        console.log("Product ID: ", id)
+        formData.append('product_id', id)
+        formData.append('image_file', file);
+
+        try {
+            const response = await axios.post(IMAGE_UPLOAD_API, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            // if (response.data.image_path) {
+            //     imageObjects.push({
+            //         image_id: response.data.image_id,
+            //         // product_id: products.value.di,
+            //         image_path: response.data.image_path,
+            //     });
+            // }
+        } catch (error) {
+            console.error('Image Upload Error:', error.message);
+        }
+        
+        return imageObjects;
+    };
 
     const createProduct = async () => {
         if (!newProduct.value.name.trim() || !newProduct.value.price) {
-            errorMessage.value = 'Please fill in required fields.'
-            return
+            errorMessage.value = 'Please fill in required fields.';
+            return;
         }
-
         try {
-            const formData = new FormData()
-            formData.append('name', newProduct.value.name)
-            formData.append('description', newProduct.value.description)
-            formData.append('price', newProduct.value.price)
-            // formData.append('stock', newProduct.value.stock)
-            formData.append('category_id', newProduct.value.category_id)
-            formData.append('brand_id', newProduct.value.brand_id)
-            // formData.append('rating', newProduct.value.rating)
-            formData.append('accessibility', newProduct.value.accessibility)
-
-            selectedFiles.value.forEach((file) => {
-                formData.append('image_paths[]', file)
-            })
-
-            const response = await axios.post(API_BASE, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-
+            console.log("New Product: ", newProduct)
+            newProduct.value.image_products = await uploadImages(newProduct.value.id, selectedFiles.value);
+            const response = await axios.post(API_BASE, newProduct.value);
             if (response.status === 201) {
                 location.href = location.href
-                products.value.push(response.data)
-                newProduct.value = { name: '', description: '', price: '', stock: 0, category_id: '', brand_id: '', image_paths: [], rating: 0, accessibility: 'PUBLIC' }
-                selectedFiles.value = []
             } else {
-                errorMessage.value = response.data.message || 'Failed to create product.'
+                errorMessage.value = response.data.message || 'Failed to create product.';
             }
         } catch (error) {
-            console.error('Create Error:', error.message)
-            errorMessage.value = error.message
+            console.error('Create Error:', error.message);
+            errorMessage.value = error.message;
         }
-    }
-
-    const createCategory = async () => {
-        if (!newCategory.value.trim()) {
-            errorMessage.value = 'Please enter a category name.'
-            return
-        }
-
-        try {
-            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
-            if (response.status === 201) {
-                location.href = location.href
-                categories.value.push(response.data)
-                newCategory.value = ''
-            }
-        } catch (error) {
-            console.error('Create Category Error:', error.message)
-            errorMessage.value = 'Failed to create category.'
-        }
-    }
-
-    const createBrand = async () => {
-        if (!newBrand.value.trim()) {
-            errorMessage.value = 'Please enter a Brand name.'
-            return
-        }
-
-        try {
-            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
-            if (response.status === 201) {
-                location.href = location.href
-                brands.value.push(response.data)
-                newBrand.value = ''
-            }
-        } catch (error) {
-            console.error('Create Brand Error:', error.message)
-            errorMessage.value = 'Failed to create Brand.'
-        }
-    }
+    };
 
     // const handleImageUpload = (event) => {
     //     selectedFiles.value = Array.from(event.target.files);
-    // }
+    // };
 
-    const handleImageUpload = (event) => {
-        selectedFiles.value = Array.from(event.target.files).map(file => {
-            return URL.createObjectURL(file);
-        });
-    };  
+    // const handleImageUpload = (event) => {
+    //     selectedFiles.value = Array.from(event.target.files).map(file => {
+    //         return URL.createObjectURL(file);
+    //     });
+    //     // for (const file of selectedFiles.value) {
+    //     //     console.log("TEST FILE: ", file)
+    //     // }
+    // };   
 
     onMounted(() => {
-        fetchProducts()
-        fetchCategories()
-        fetchBrands()
-    })
+        fetchProducts();
+        fetchCategories();
+        fetchBrands();
+    });
 </script>
 
 <template>
@@ -165,7 +138,7 @@
         <h1 class="text-xl font-bold mb-4">Create New Product</h1>
 
         <p class="font-bold">Product name :</p>
-        <input v-model="newProduct.name" type="text" placeholder="product Name" class="border p-2 rounded w-full" required />
+        <input v-model="newProduct.name" type="text" placeholder="product name" class="border p-2 rounded w-full" required />
         
         <p class="font-bold">Description :</p>
         <textarea v-model="newProduct.description" placeholder="description (optional)" class="border p-2 rounded w-full"></textarea>
@@ -201,14 +174,6 @@
         <div class="mt-2">
             <input v-model="newBrand" type="text" placeholder="add new brand name" class="border p-2 rounded w-full" />
             <button @click.prevent="createBrand" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Brand</button>
-        </div>
-
-        <p class="font-bold">Picture :</p>
-        <div class="relative border border-black border-1 rounded-md p-2 pt-3 w-fit">
-            <input type="file" multiple @change="handleImageUpload" id="image-upload"/>
-            <label for="image-upload" class="py-2 px-5 bg-blue-500 text-white text-sm rounded-lg text-lg hover:bg-blue-600">
-                Choose Image(s)
-            </label>    
         </div>
 
         <div v-if="selectedFiles.length > 0" class="mt-4">
