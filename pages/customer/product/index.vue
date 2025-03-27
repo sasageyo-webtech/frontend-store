@@ -13,12 +13,12 @@
 
            <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
             <div 
-
+            
                 class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg" 
                 v-for="(product, index) in products" 
                 :key="index">
 
-                <NuxtLink :to="`/customer/product/${product.id}`">
+                <NuxtLink :to="`/customer/product/${product.id}`"> 
 
                     <figure class="flex justify-center p-4">
                         <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />
@@ -65,17 +65,26 @@ useHead({
 })
 
 const fetchProducts = async () => {
-    try {
-        const response = await axios.get('http://localhost/api/products');
-        products.value = response.data.data;
-
-        console.log(products.value)
-
-    } catch (error) {
-        console.error('Error fetching products:', error);
+  const { category_id, brand_id } = useRoute().query;
+  try {
+    let url = '/products';
+    if (category_id) {
+      url += `/categories/${category_id}`;
     }
+    if (brand_id) {
+        url += `/brands/${brand_id}`;
+    }
+    const response = await apiClient.get(url);
+    products.value = response.data.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
 };
 
-onMounted(fetchProducts)
+watchEffect(() => {
+  fetchProducts();
+}, { flush: 'post' });
+
+// onMounted(fetchProducts)
 
 </script>

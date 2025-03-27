@@ -8,7 +8,7 @@
             </div>
             <div id="item2" class="carousel-item w-full">
             <img
-                src="/img/Frame1.png"
+                src="/img/Frame3.png"
                 class="w-full" />
             </div>
         </div>
