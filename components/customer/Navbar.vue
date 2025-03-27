@@ -142,7 +142,7 @@ onMounted(async () => {
                     <NuxtLink to="/customer/profile" class="justify-between"> Profile </NuxtLink>
                 </li>
                 <li><NuxtLink to="/customer/order">My Orders</NuxtLink></li>
-                <li><NuxtLink to="/customer/address/create">My Address</NuxtLink></li>
+                <li><NuxtLink to="/customer/address/">My Address</NuxtLink></li>
 
                 <button @click="logoutUser" class="btn btn-secondary btn-sm text-white px-4 py-2 rounded">
                     Logout
