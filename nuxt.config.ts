@@ -3,15 +3,11 @@ export default defineNuxtConfig({
 
   // pages: false,
 
-<<<<<<< HEAD
-  modules: ['@vueuse/nuxt', "@nuxtjs/tailwindcss", '@pinia/nuxt'],
-=======
   modules: [
     '@vueuse/nuxt',
     "@nuxtjs/tailwindcss",
     '@pinia/nuxt'
   ],
->>>>>>> 50680a6e2d90fb8e0cdf07b55e381415f913ee9d
 
   pinia: {
     storesDirs: ['./stores/**', './custom-folder/stores/**'],

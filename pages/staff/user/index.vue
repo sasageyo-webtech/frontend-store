@@ -18,19 +18,95 @@
     const API_BASE = 'http://localhost/api/users';
     const API_ADDRESS = 'http://localhost/api/address-customers';
 
+    const mockUsers = [
+        {
+            id: 1,
+            username: "john_doe",
+            firstname: "John",
+            lastname: "Doe",
+            email: "john@example.com",
+            gender: "Male",
+            citizen_code: "1234567890",
+            birthdate: "1990-05-15",
+            phone_number: "0812345678",
+            role: "Customer",
+            email_verified_at: "2024-01-01T00:00:00Z",
+            image_path: "https://via.placeholder.com/100"
+        },
+        {
+            id: 2,
+            username: "jane_smith",
+            firstname: "Jane",
+            lastname: "Smith",
+            email: "jane@example.com",
+            gender: "Female",
+            citizen_code: "0987654321",
+            birthdate: "1985-07-20",
+            phone_number: "0898765432",
+            role: "Customer",
+            email_verified_at: null,
+            image_path: "https://via.placeholder.com/100"
+        }
+    ];
+
+
+    const mockAddresses = {
+        1: {
+            name: "Patdarin Faithong",
+            phone_number: "0987654321",
+            house_number: "456",
+            building: "test",
+            street: "Second St",
+            sub_district: "Sub District",
+            district: "District",
+            province: "Province",
+            country: "Country",
+            postal_code: "54321",
+            detail_address: "Next to the school"
+        },
+        2: {
+            name: "Jane Smith",
+            phone_number: "0876543210",
+            house_number: "789",
+            building: "Building B",
+            street: "Main Street",
+            sub_district: "Another Sub District",
+            district: "Another District",
+            province: "Another Province",
+            country: "Another Country",
+            postal_code: "67890",
+            detail_address: "Near the shopping mall"
+        }
+    };
+
+
+    // const fetchUsers = async () => {
+    //     loading.value = true;
+    //     errorMessage.value = '';
+    //     try {
+    //         const response = await axios.get(API_BASE);
+    //         if (response.data.data) {
+    //             console.log(response.data.data);
+    //             users.value = response.data.data;
+    //         } else {
+    //             errorMessage.value = 'Failed to fetch users: Invalid data format.';
+    //         }
+    //     } catch (error) {
+    //         errorMessage.value = error.message;
+    //     } finally {
+    //         loading.value = false;
+    //     }
+    // };
+
     const fetchUsers = async () => {
         loading.value = true;
-        errorMessage.value = '';
+        errorMessage.value = "";
         try {
-            const response = await axios.get(API_BASE);
-            if (response.data.data) {
-                console.log(response.data.data);
-                users.value = response.data.data;
-            } else {
-                errorMessage.value = 'Failed to fetch users: Invalid data format.';
-            }
+            // Simulate API response delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            users.value = mockUsers;
         } catch (error) {
-            errorMessage.value = error.message;
+            errorMessage.value = "Failed to fetch users";
         } finally {
             loading.value = false;
         }
@@ -41,16 +117,26 @@
         fetchAddress(user.id);
     };
 
+    // const fetchAddress = async (userId) => {
+    //     try {
+    //         const response = await axios.get(`${API_ADDRESS}/${userId}`);
+    //         if (response.data.data) {
+    //             address.value = response.data.data;
+    //         } else {
+    //             console.error('Address data not found');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching address:', error);
+    //     }
+    // };
+
     const fetchAddress = async (userId) => {
         try {
-            const response = await axios.get(`${API_ADDRESS}/${userId}`);
-            if (response.data.data) {
-                address.value = response.data.data;
-            } else {
-                console.error('Address data not found');
-            }
+            // Simulate API response delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            address.value = mockAddresses[userId] || null;
         } catch (error) {
-            console.error('Error fetching address:', error);
+            console.error("Error fetching address:", error);
         }
     };
 
@@ -114,7 +200,7 @@
             
             <div v-if="showAddress && address" class="p-4 space-y-3 border-t border-gray-300 mt-4">
                 <h3 class="font-bold text-lg">Address Information</h3>
-                <p><strong>Name:</strong> {{ address.name }}</p>
+                <!-- <p><strong>Name:</strong> {{ address.name }}</p> -->
                 <p><strong>Phone Number:</strong> {{ address.phone_number }}</p>
                 <p><strong>House Number:</strong> {{ address.house_number }}</p>
                 <p><strong>Building:</strong> {{ address.building }}</p>
