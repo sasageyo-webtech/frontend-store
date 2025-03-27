@@ -1,5 +1,29 @@
+<script setup>
+const userStore = useUser()
+const carts = ref([])
+
+const deleteCart = async (cart_id) => {
+    const response = await apiClient.delete(`/carts/${cart_id}`)
+    console.log(response.status)
+
+}
+
+onMounted( async ()=>{
+    userStore.loadUser();
+
+    const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
+    carts.value = cartsResponse.data.data
+
+    console.log(carts.value)
+})
+
+</script>
+
 <template>
     <div>
+        <pre>
+            {{  carts }}
+        </pre>
         <div class="grid gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg m-20">
             <div>
                 <div class="overflow-x-auto">
@@ -21,7 +45,7 @@
                 <!-- row 1 -->
                 <tr>
                     <th>
-                    <button>
+                    <button @click="deleteCart(51)">
                         <SvgDelete></SvgDelete>
                     </button>
                     </th>
@@ -208,7 +232,5 @@
     </div>
 </template>
 
-<script setup>
 
-</script>
 
