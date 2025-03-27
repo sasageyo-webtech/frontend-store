@@ -4,6 +4,9 @@
 
     definePageMeta({ layout: 'staff' });
 
+    const showSuccessCreateProduct = ref(false);
+    const showSuccessCreateCategory = ref(false);
+    const showSuccessCreateBrand = ref(false);
     const loading = ref(false);
     const products = ref([]);
     const categories = ref([]);
@@ -27,7 +30,6 @@
     const API_BASE = 'http://localhost/api/products';
     const CATEGORY_API_BASE = 'http://localhost/api/categories';
     const BRAND_API_BASE = 'http://localhost/api/brands';
-    // const IMAGE_UPLOAD_API = 'http://localhost/api/products/images';
 
     const fetchProducts = async () => {
         loading.value = true;
@@ -64,33 +66,6 @@
         }
     };
 
-    const uploadImages = async (id, file) => {
-        const imageObjects = [];
-
-        const formData = new FormData();
-        console.log("Product ID: ", id)
-        formData.append('product_id', id)
-        formData.append('image_file', file);
-
-        try {
-            const response = await axios.post(IMAGE_UPLOAD_API, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-
-            // if (response.data.image_path) {
-            //     imageObjects.push({
-            //         image_id: response.data.image_id,
-            //         // product_id: products.value.di,
-            //         image_path: response.data.image_path,
-            //     });
-            // }
-        } catch (error) {
-            console.error('Image Upload Error:', error.message);
-        }
-        
-        return imageObjects;
-    };
-
     const createProduct = async () => {
         if (!newProduct.value.name.trim() || !newProduct.value.price) {
             errorMessage.value = 'Please fill in required fields.';
@@ -101,7 +76,7 @@
             newProduct.value.image_products = await uploadImages(newProduct.value.id, selectedFiles.value);
             const response = await axios.post(API_BASE, newProduct.value);
             if (response.status === 201) {
-                location.href = location.href
+                showSuccessCreateProduct.value = true;
             } else {
                 errorMessage.value = response.data.message || 'Failed to create product.';
             }
@@ -111,18 +86,43 @@
         }
     };
 
-    // const handleImageUpload = (event) => {
-    //     selectedFiles.value = Array.from(event.target.files);
-    // };
+    const createCategory = async () => {
+        if (!newCategory.value.trim()) {
+            errorMessage.value = 'Please enter a category name.'
+            return
+        }
 
-    // const handleImageUpload = (event) => {
-    //     selectedFiles.value = Array.from(event.target.files).map(file => {
-    //         return URL.createObjectURL(file);
-    //     });
-    //     // for (const file of selectedFiles.value) {
-    //     //     console.log("TEST FILE: ", file)
-    //     // }
-    // };   
+        try {
+            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
+            if (response.status === 201) {
+                showSuccessCreateCategory.value = true;
+                categories.value.push(response.data)
+                newCategory.value = ''
+            }
+        } catch (error) {
+            console.error('Create Category Error:', error.message)
+            errorMessage.value = 'Failed to create category.'
+        }
+    }
+
+    const createBrand = async () => {
+        if (!newBrand.value.trim()) {
+            errorMessage.value = 'Please enter a Brand name.'
+            return
+        }
+
+        try {
+            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
+            if (response.status === 201) { 
+                showSuccessCreateBrand.value = true;   
+                brands.value.push(response.data)
+                newBrand.value = ''
+            }
+        } catch (error) {
+            console.error('Create Brand Error:', error.message)
+            errorMessage.value = 'Failed to create Brand.'
+        }
+    }
 
     onMounted(() => {
         fetchProducts();
@@ -193,6 +193,25 @@
 
         <button type="submit" class="bg-green-500 text-white p-2 rounded w-full">Add Product</button>
     </form>
+
+        <Report 
+            :show="showSuccessCreateProduct" 
+            title="Create Product Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessCreateProduct = false" 
+        />
+        <Report 
+            :show="showSuccessCreateCategory" 
+            title="Create Category Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessCreateCategory = false" 
+        />
+        <Report 
+            :show="showSuccessCreateBrand" 
+            title="Create Brand Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessCreateBrand = false" 
+        />
 </template>
 
 <style lang="scss" scoped>

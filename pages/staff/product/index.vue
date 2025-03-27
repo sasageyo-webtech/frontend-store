@@ -1,11 +1,17 @@
 <script setup>
     import { ref, onMounted } from 'vue';
     import axios from 'axios';
+    import Report from '@/components/staff/modals/Report.vue';
 
     definePageMeta({
         layout: 'staff',
     });
 
+    const showSuccessUploadImage = ref(false);
+    const showSuccessCreateCategory = ref(false);
+    const showSuccessCreateBrand = ref(false);
+    const showSuccessUpdateProduct = ref(false);
+    const showSuccessDeleteBrand = ref(false);
     const products = ref([])
     const categories = ref([])
     const newCategory = ref('')
@@ -76,7 +82,7 @@
         try {
             const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
             if (response.status === 201) {
-                location.href = location.href
+                showSuccessCreateCategory.value = true;
                 categories.value.push(response.data)
                 newCategory.value = ''
             }
@@ -95,7 +101,7 @@
         try {
             const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
             if (response.status === 201) { 
-                location.href = location.href     
+                showSuccessCreateBrand.value = true;   
                 brands.value.push(response.data)
                 newBrand.value = ''
             }
@@ -108,10 +114,13 @@
     const uploadImage = async () => {
         const formData = new FormData();
         formData.append('product_id', selectedProduct.value.id)
-        formData.append('image_file', selectedFiles.value);
-        console.log("Product ID: ", selectedProduct.value.id)
-        console.log("Image : ", selectedFiles.value)
-        console.log("FormData : ", formData)
+        formData.append('image_file', selectedFiles.value[0]);
+        // console.log("Product ID: ", selectedProduct.value.id)
+        // console.log("Image : ", selectedFiles.value)
+        // console.log("FormData : ", formData)
+        // selectedFiles.value.forEach((file) => {
+        //     formData.append('image_file', file);
+        // });
 
         try {
             const response = await axios.post(IMAGE_UPLOAD_API, formData, {
@@ -119,7 +128,7 @@
             });
 
             if (response.status === 200) {
-                location.href = location.href
+                showSuccessUploadImage.value = true;
             }
         } catch (error) {
             console.error('Image Upload Error:', error.message);
@@ -154,7 +163,7 @@
             const response = await axios.put(`${API_BASE}/${selectedProduct.value.id}`, selectedProduct.value);
 
             if (response.status === 200) {
-                location.href = location.href;
+                showSuccessUpdateProduct.value = true;
                 fetchProducts();
                 selectedProduct.value = null;
             } else {
@@ -170,7 +179,7 @@
         try {
             const response = await axios.delete(`${API_BASE}/${id}`);
             if (response.status === 200) {
-                location.href = location.href
+                showDeleteSuccess.value = true;
                 products.value = products.value.filter(p => p.id !== id);
                 if (selectedProduct.value && selectedProduct.value.id === id) {
                     selectedProduct.value = null;
@@ -295,6 +304,37 @@
 
             <button @click="updateProduct" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-4">Save Changes</button>
         </div>
+
+        <Report 
+            :show="showSuccessUploadImage" 
+            title="Upload Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessUploadImage = false" 
+        />
+        <Report 
+            :show="showSuccessCreateCategory" 
+            title="Create Category Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessCreateCategory = false" 
+        />
+        <Report 
+            :show="showSuccessCreateBrand" 
+            title="Create Brand Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessCreateBrand = false" 
+        />
+        <Report 
+            :show="showSuccessUpdateProduct" 
+            title="Update Product Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessUpdateProduct = false" 
+        />
+        <Report 
+            :show="showSuccessDeleteBrand" 
+            title="Delete Product Completed" 
+            buttonText="Got it!" 
+            @close="showSuccessDeleteBrand = false" 
+        />
     </div>
 </template>
 
