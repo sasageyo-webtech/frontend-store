@@ -1,7 +1,6 @@
 <script setup>
     import { ref, onMounted } from 'vue';
     import axios from 'axios';
-    import { toRaw } from "vue";
 
     definePageMeta({
         layout: 'staff',
@@ -10,15 +9,15 @@
     const products = ref([])
     const categories = ref([])
     const newCategory = ref('')
-    // const brands = ref([])
-    // const newBrand = ref('')
+    const brands = ref([])
+    const newBrand = ref('')
     const selectedFiles = ref([])
     const selectedProduct = ref(null);
     const loading = ref(false)
     const errorMessage = ref('')
     const API_BASE = 'http://localhost/api/products'
     const CATEGORY_API_BASE = 'http://localhost/api/categories'
-    // const BRAND_API_BASE = 'http://localhost/api/brands'
+    const BRAND_API_BASE = 'http://localhost/api/brands'
 
     const fetchProducts = async () => {
         loading.value = true;
@@ -26,7 +25,6 @@
         try {
             const response = await axios.get(API_BASE);
             
-            // Ensure we're accessing the correct array
             if (response.data.data) {
                 console.log(response.data)
                 console.log(response.data.data)
@@ -52,7 +50,7 @@
         try {
             const response = await axios.get(CATEGORY_API_BASE);
             categories.value = response.data.data;
-            console.log("Fetched Categories:", categories.value); // Debugging
+            console.log("Fetched Categories:", categories.value);
         } catch (error) {
             console.error('Category Fetch Error:', error.message);
             errorMessage.value = 'Failed to fetch categories.';
@@ -60,15 +58,15 @@
     };
 
 
-    // const fetchBrands = async () => {
-    //     try {
-    //         const response = await axios.get(BRAND_API_BASE)
-    //         brands.value = response.data
-    //     } catch (error) {
-    //         console.error('Category Fetch Error:', error.message)
-    //         errorMessage.value = 'Failed to fetch brands.'
-    //     }
-    // }
+    const fetchBrands = async () => {
+        try {
+            const response = await axios.get(BRAND_API_BASE)
+            brands.value = response.data
+        } catch (error) {
+            console.error('Category Fetch Error:', error.message)
+            errorMessage.value = 'Failed to fetch brands.'
+        }
+    }
 
     const createCategory = async () => {
         if (!newCategory.value.trim()) {
@@ -89,34 +87,34 @@
         }
     }
 
-    // const createBrand = async () => {
-    //     if (!newBrand.value.trim()) {
-    //         errorMessage.value = 'Please enter a Brand name.'
-    //         return
-    //     }
+    const createBrand = async () => {
+        if (!newBrand.value.trim()) {
+            errorMessage.value = 'Please enter a Brand name.'
+            return
+        }
 
-    //     try {
-    //         const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
-    //         if (response.status === 201) { 
-    //             location.href = location.href     
-    //             brands.value.push(response.data)
-    //             newBrand.value = ''
-    //         }
-    //     } catch (error) {
-    //         console.error('Create Brand Error:', error.message)
-    //         errorMessage.value = 'Failed to create Brand.'
-    //     }
-    // }
+        try {
+            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
+            if (response.status === 201) { 
+                location.href = location.href     
+                brands.value.push(response.data)
+                newBrand.value = ''
+            }
+        } catch (error) {
+            console.error('Create Brand Error:', error.message)
+            errorMessage.value = 'Failed to create Brand.'
+        }
+    }
+
+    const handleImageUpload = (event) => {
+        selectedFiles.value = Array.from(event.target.files).map(file => {
+            return URL.createObjectURL(file);
+        });
+    };    
 
     // const handleImageUpload = (event) => {
-    //     selectedFiles.value = Array.from(event.target.files).map(file => {
-    //         // Generate a URL for the image file to display it
-    //         return URL.createObjectURL(file);
-    //     });
-    // };    
-    const handleImageUpload = (event) => {
-        selectedFiles.value = Array.from(event.target.files);
-    }
+    //     selectedFiles.value = Array.from(event.target.files);
+    // }
 
     const selectProduct = (product) => {
         selectedProduct.value = { ...product };
@@ -132,9 +130,9 @@
         const response = await axios.put(`${API_BASE}/${selectedProduct.value.id}`, selectedProduct.value);
 
         if (response.status === 200) {
-            location.href = location.href;  // Refresh the page
+            location.href = location.href;
             fetchProducts();
-            selectedProduct.value = null;  // Clear selected product after successful update
+            selectedProduct.value = null;
         } else {
             errorMessage.value = 'Failed to update product.';
         }
@@ -166,6 +164,7 @@
     onMounted(() => {
         fetchProducts()
         fetchCategories()
+        fetchBrands()        
     })
 </script>
 
@@ -226,10 +225,10 @@
                 </div>
 
                 <!-- BRAND -->
-                <!-- <p class="font-bold">Brand :</p>
+                <p class="font-bold">Brand :</p>
                 <select v-model="selectedProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
                     <li v-for="brand in brands" :key="brand.id" :value="brand.id">
-                        <option value="" disabled selected>Select a Brand</option>
+                        <!-- <option value="" disabled selected>Select a Brand</option> -->
                         <option v-for="b in brand" :key="b.id" :value="b.id">
                             {{ b.name }}
                         </option>   
@@ -238,7 +237,7 @@
                 <div class="mt-2">
                     <input v-model="newBrand" type="text" placeholder="Add New Brand Name" class="border p-2 rounded w-full" />
                     <button @click.prevent="createBrand" class="bg-blue-500 text-white p-2 rounded w-full mt-2">Create New Brand</button>
-                </div> -->
+                </div>
 
                 <p class="font-bold">Picture :</p>
                 <div v-if="selectedProduct.image_paths.length > 0" class="mt-4">

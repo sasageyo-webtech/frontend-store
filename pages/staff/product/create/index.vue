@@ -141,18 +141,25 @@
         }
     }
 
+    // const handleImageUpload = (event) => {
+    //     selectedFiles.value = Array.from(event.target.files);
+    // }
+
     const handleImageUpload = (event) => {
-        selectedFiles.value = Array.from(event.target.files);
-    }
+        selectedFiles.value = Array.from(event.target.files).map(file => {
+            return URL.createObjectURL(file);
+        });
+    };  
 
     onMounted(() => {
         fetchProducts()
         fetchCategories()
+        fetchBrands()
     })
 </script>
 
 <template>
-                <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
     <form @submit.prevent="createProduct" class="mt-10 mx-16 w-1/2 space-y-2">
         <h1 class="text-xl font-bold mb-4">Create New Product</h1>
@@ -202,6 +209,15 @@
             <label for="image-upload" class="py-2 px-5 bg-blue-500 text-white text-sm rounded-lg text-lg hover:bg-blue-600">
                 Choose Image(s)
             </label>    
+        </div>
+
+        <div v-if="selectedFiles.length > 0" class="mt-4">
+            <p class="mb-2">Preview Images:</p>
+            <div class="flex gap-10">
+                <div v-for="(file, index) in selectedFiles" :key="index" class="w-24 h-24">
+                    <img :src="file" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
+                </div>
+            </div>
         </div>
 
         <p class="font-bold">Privacy :</p>
