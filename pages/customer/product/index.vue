@@ -53,7 +53,6 @@
 
 
 <script setup>
-import axios from 'axios';
 
 const products = ref([])
 

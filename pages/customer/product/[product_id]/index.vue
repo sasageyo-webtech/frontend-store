@@ -17,6 +17,7 @@ const decreaseQuantity = () => {
 };
 
 const fetchProduct = async () => {
+        console.log(useRoute.params)
         const {product_id} = useRoute().params
         try {
             const response = await apiClient.get(`/products/${product_id}`);
@@ -61,6 +62,11 @@ onMounted(async () => {
     await userStore.loadUser()
     await fetchProduct()
 })
+
+// ใช้ watchEffect เพื่อให้แน่ใจว่าฟังก์ชัน fetchProduct จะทำงานเมื่อ params เปลี่ยน
+watchEffect(() => {
+    fetchProduct();
+});
 
 
 </script>
