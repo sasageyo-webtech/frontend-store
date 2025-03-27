@@ -7,20 +7,6 @@ const categories = ref([]);
 const brands = ref([]);
 const carts = ref([])
 
-<<<<<<< HEAD
-  const logoutUser = async () => {
-    router.push('/auth/login')
-      // try {
-      //     await logout();
-      // } catch (error) {
-      //     console.error('Logout failed:', error);
-      // } finally {
-      //     localStorage.removeItem('authToken');
-      //     localStorage.removeItem('user');
-      //     router.push('/auth/login');
-      // }
-  };
-=======
 const logoutUser = async () => {
     try {
         const response = await apiClient.post('/user/revoke', {}, { headers: {
@@ -53,7 +39,6 @@ onMounted(async () => {
     console.error('Failed to fetch categories and brands:', error);
   }
 });
->>>>>>> 1943c529b33712b5dc76df57c859f8f6075f6116
 </script>
 
 
