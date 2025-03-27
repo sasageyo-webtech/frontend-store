@@ -7,9 +7,9 @@
 
         <div class="flex">
 
-            <div>
+            <!-- <div>
                 <customerSidebar></customerSidebar>
-            </div>
+            </div> -->
 
            <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
             <div 
@@ -40,7 +40,7 @@
 
                 </NuxtLink>
             </div>
-            <!-- <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination> -->
+            <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination>
             </div> 
 
             
