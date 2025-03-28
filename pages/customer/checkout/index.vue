@@ -4,6 +4,7 @@ const carts = ref([])
 const customer_address = ref({})
 const hasAddress = ref()
 const imageFile = ref(null) 
+const router = useRouter()
 
 const fetchCarts = async () => {
     const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
@@ -60,6 +61,7 @@ const createOrder = async () => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         console.log("Order created successfully", response.message);
+        router.push('/customer/order')
         // Handle response or redirect to a success page
     } catch (error) {
         console.error("Error creating order", error);

@@ -50,7 +50,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
   
-                            <button @click="deleteAddress(5)" class="btn btn-sm btn-error">Delete</button>
+                            <button @click="deleteAddress(addrese.customer_address_id)" class="btn btn-sm btn-error">Delete</button>
                         </div>
                     </li>
                 </ul>
