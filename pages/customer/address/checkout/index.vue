@@ -24,9 +24,16 @@ onMounted( async ()=>{
 <template>
     <div>
 
+        <NuxtLink to="/customer/checkout" class="flex mx-20 mt-5">
+            <svgLess></svgLess>
+            <span>Back</span>
+        </NuxtLink>
+
         <div class="grid gap-4 p-4 mx-20">
+          
             <div class="flex items-center">
                 <h1 class="card-title font-bold text-lg text-primary">Address List</h1>
+
                 <div class="ml-auto">
                     <NuxtLink to="/customer/address/create">
                         <button class="btn btn-outline btn-info">Add new address</button>

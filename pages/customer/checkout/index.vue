@@ -109,7 +109,7 @@ watchEffect(() => {
                                     <div class="flex items-center gap-3">
                                         <div class="avatar">
                                             <div class="mask mask-squircle h-12 w-12">
-                                                <img :src="cart.product.image_paths" alt="Avatar Tailwind CSS Component" />
+                                                <img :src="cart.product.image_paths" alt="image of product not found" />
                                             </div>
                                         </div>
                                         <div>
@@ -186,7 +186,8 @@ watchEffect(() => {
                     <div>
                         <fieldset>
                             <div class="mt-6 space-y-6">
-                                <img src="/public/img/prompt_pay-book.jpg" alt="qr code not found">
+                                <img src="/public/img/prompt_pay-book.jpg" alt="qr code not found" 
+                                class="w-40 h-40">
 
                                 <!-- <div class="flex items-center gap-x-3">
                                     <input id="push-everything" name="push-notifications" type="radio" checked class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white" />
@@ -200,9 +201,14 @@ watchEffect(() => {
                         </fieldset>
                     </div>
                      <!-- QR Code Image Upload -->
-                    <div class="mt-4">
-                        <input type="file" @change="handleFileChange" accept="image/*" 
-                        class="file-input bg-blue-200 font-bold" />
+                     <h1 class="card-title font-bold text-lg text-primary flex items-center mt-4">
+                        Upload E-Slip
+                    </h1>
+
+                    <div class="mt-6">
+                        <input type="file" class="file-input file-input-info" @change="handleFileChange" accept="image/*"/>
+                        <!-- <input type="file" @change="handleFileChange" accept="image/*" 
+                        class="file-input bg-blue-200 font-bold" /> -->
                     </div>
                 </div>
 

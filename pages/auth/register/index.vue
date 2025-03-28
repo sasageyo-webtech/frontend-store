@@ -1,8 +1,5 @@
     <script setup>
 
-    definePageMeta({
-    layout: 'empty',
-    })
     const router = useRouter();
     const form = ref({  
     username: 'testt',
@@ -58,7 +55,7 @@
     </script>
 
     <template>
-        <div class="flex justify-center items-center min-h-screen bg-gray-100">
+        <div class="flex justify-center items-center min-h-screen bg-orange-100">
         <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold text-center mb-4">Register</h2>
             <form @submit.prevent="register">

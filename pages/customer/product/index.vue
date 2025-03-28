@@ -40,7 +40,7 @@
 
                 </NuxtLink>
             </div>
-            <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination>
+            <!-- <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination> -->
             </div> 
 
             

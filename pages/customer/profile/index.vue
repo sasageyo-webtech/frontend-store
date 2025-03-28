@@ -14,9 +14,9 @@
           <p class="text-sm">📅 Birthdate: {{ formatDate(userStore.userInfo.birthdate) }}</p>
           <p class="text-sm"> {{ userStore.userInfo.phone_number }}</p>
           <p class="text-sm"> {{ userStore.userInfo.citizen_code }}</p>
-          <div class="card-actions">
+          <!-- <div class="card-actions">
             <button class="btn btn-primary">Edit Profile</button>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
