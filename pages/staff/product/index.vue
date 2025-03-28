@@ -210,7 +210,7 @@
             <div v-if="loading" class="text-gray-500">Loading products...</div>
             <ul v-else> 
                 <!-- <li v-for="product in products" :key="product.id" class="flex flex-col justify-between p-2 px-3 border border-[rgba(0,0,0,0.2)] rounded"> -->
-                    <li v-for="prod in products" @click="selectProduct(prod)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-[rgba(0,0,0,0.1)] shadow-xl rounded">
+                    <li :key="index" v-for="(prod, index) in products" @click="selectProduct(prod)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-[rgba(0,0,0,0.1)] shadow-xl rounded">
                         <div class="flex items-center">
                             <img :src="prod.image_products?.[0]?.image_path || 'default-image.jpg'" alt="Product Image" class="w-16 h-16 object-cover mr-4 rounded" />
                             <div>

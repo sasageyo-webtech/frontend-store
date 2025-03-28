@@ -1,158 +1,78 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import { useRouter } from 'vue-router';
-    import axios from 'axios';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-    definePageMeta({
-        layout: 'staff',
-    });
+definePageMeta({
+    layout: 'staff',
+});
 
-    const router = useRouter();
+const router = useRouter();
 
-    const users = ref([]);
-    const selectedUser = ref(null);
-    const loading = ref(false);
-    const errorMessage = ref('');
-    const showAddress = ref(false); 
-    const address = ref(null);
-    const API_BASE = 'http://localhost/api/users';
-    const API_ADDRESS = 'http://localhost/api/address-customers';
+const users = ref([]);
+const selectedUser = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
+const showAddress = ref(false);
+const address = ref(null);
+const API_BASE = 'http://localhost/api/users';
+const API_ADDRESS = 'http://localhost/api/address-customers';
 
-    const mockUsers = [
-        {
-            id: 1,
-            username: "john_doe",
-            firstname: "John",
-            lastname: "Doe",
-            email: "john@example.com",
-            gender: "Male",
-            citizen_code: "1234567890",
-            birthdate: "1990-05-15",
-            phone_number: "0812345678",
-            role: "Customer",
-            email_verified_at: "2024-01-01T00:00:00Z",
-            image_path: "https://via.placeholder.com/100"
-        },
-        {
-            id: 2,
-            username: "jane_smith",
-            firstname: "Jane",
-            lastname: "Smith",
-            email: "jane@example.com",
-            gender: "Female",
-            citizen_code: "0987654321",
-            birthdate: "1985-07-20",
-            phone_number: "0898765432",
-            role: "Customer",
-            email_verified_at: null,
-            image_path: "https://via.placeholder.com/100"
+// Function to fetch users
+const fetchUsers = async () => {
+    loading.value = true;
+    errorMessage.value = '';
+    try {
+        const response = await axios.get(API_BASE);
+        if (response.data.data) {
+            users.value = response.data.data;
+        } else {
+            errorMessage.value = 'Failed to fetch users: Invalid data format.';
         }
-    ];
+    } catch (error) {
+        errorMessage.value = `Failed to fetch users: ${error.message}`;
+    } finally {
+        loading.value = false;
+    }
+};
 
+// Function to select a user and fetch their address
+const selectUser = (user) => {
+    selectedUser.value = { ...user };
+    fetchAddress(user.customer_id);
+};
 
-    const mockAddresses = {
-        1: {
-            name: "Patdarin Faithong",
-            phone_number: "0987654321",
-            house_number: "456",
-            building: "test",
-            street: "Second St",
-            sub_district: "Sub District",
-            district: "District",
-            province: "Province",
-            country: "Country",
-            postal_code: "54321",
-            detail_address: "Next to the school"
-        },
-        2: {
-            name: "Jane Smith",
-            phone_number: "0876543210",
-            house_number: "789",
-            building: "Building B",
-            street: "Main Street",
-            sub_district: "Another Sub District",
-            district: "Another District",
-            province: "Another Province",
-            country: "Another Country",
-            postal_code: "67890",
-            detail_address: "Near the shopping mall"
+// Function to fetch the user's address
+const fetchAddress = async (userId) => {
+    try {
+        const response = await axios.get(`${API_ADDRESS}?customer_id=${userId}`);
+        if (response.data) {
+            address.value = response.data.data[0];
+        } else {
+            address.value = null;
         }
-    };
+    } catch (error) {
+        address.value = null;
+        console.error('Error fetching address:', error);
+    }
+};
 
+// Toggle the display of the address information
+const toggleAddress = () => {
+    showAddress.value = !showAddress.value;
+};
 
-    // const fetchUsers = async () => {
-    //     loading.value = true;
-    //     errorMessage.value = '';
-    //     try {
-    //         const response = await axios.get(API_BASE);
-    //         if (response.data.data) {
-    //             console.log(response.data.data);
-    //             users.value = response.data.data;
-    //         } else {
-    //             errorMessage.value = 'Failed to fetch users: Invalid data format.';
-    //         }
-    //     } catch (error) {
-    //         errorMessage.value = error.message;
-    //     } finally {
-    //         loading.value = false;
-    //     }
-    // };
+// Navigate to the user's orders page
+const goToUserOrders = () => {
+    if (selectedUser.value) {
+        router.push(`/staff/user/order/${selectedUser.value.customer_id}`);
+    }
+};
 
-    const fetchUsers = async () => {
-        loading.value = true;
-        errorMessage.value = "";
-        try {
-            // Simulate API response delay
-            await new Promise(resolve => setTimeout(resolve, 500));
-            users.value = mockUsers;
-        } catch (error) {
-            errorMessage.value = "Failed to fetch users";
-        } finally {
-            loading.value = false;
-        }
-    };
-
-    const selectUser = (user) => {
-        selectedUser.value = { ...user };
-        fetchAddress(user.id);
-    };
-
-    // const fetchAddress = async (userId) => {
-    //     try {
-    //         const response = await axios.get(`${API_ADDRESS}/${userId}`);
-    //         if (response.data.data) {
-    //             address.value = response.data.data;
-    //         } else {
-    //             console.error('Address data not found');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching address:', error);
-    //     }
-    // };
-
-    const fetchAddress = async (userId) => {
-        try {
-            // Simulate API response delay
-            await new Promise(resolve => setTimeout(resolve, 500));
-            address.value = mockAddresses[userId] || null;
-        } catch (error) {
-            console.error("Error fetching address:", error);
-        }
-    };
-
-    const toggleAddress = () => {
-        showAddress.value = !showAddress.value;
-    };
-
-    const goToUserOrders = () => {
-        if (selectedUser.value) {
-            router.push(`/staff/user/order/${selectedUser.value.id}`);
-        }
-    };
-
-    onMounted(() => {
-        fetchUsers();
-    });
+// On component mount, fetch users
+onMounted(() => {
+    fetchUsers();
+});
 </script>
 
 <template>
@@ -162,9 +82,9 @@
             <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
             <div v-if="loading" class="text-gray-500">Loading users...</div>
             <ul v-else>
-                <li v-for="user in users" :key="user.id" @click="selectUser(user)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-gray-300 shadow-xl rounded cursor-pointer">
+                <li v-for="user in users" :key="user.user_id" @click="selectUser(user)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-gray-300 shadow-xl rounded cursor-pointer">
                     <div class="flex items-center">
-                        <img :src="user.image_path" alt="User Image" class="w-12 h-12 object-cover mr-4 rounded-full" />
+                        <!-- <img :src="user.image_path" alt="User Image" class="w-12 h-12 object-cover mr-4 rounded-full" /> -->
                         <div>
                             <span class="font-bold">{{ user.firstname }} {{ user.lastname }}</span> - {{ user.email }}
                         </div>
@@ -178,14 +98,14 @@
                 <h2 class="text-xl font-bold">User Information</h2>
                 <div class="flex gap-5">
                     <button @click="toggleAddress" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-900">Address</button>
-                    <button @click="goToUserOrders" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-900">Orders</button> <!-- Navigate to Orders -->
+                    <button @click="goToUserOrders" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-900">Orders</button>
                 </div>
             </div>
             <div class="p-4 space-y-3">
-                <div v-if="selectedUser.image_path">
+                <!-- <div v-if="selectedUser.image_path">
                     <p class="font-bold">Profile Picture:</p>
                     <img :src="selectedUser.image_path" alt="User Image" class="w-24 h-24 object-cover rounded-md" />
-                </div>
+                </div> -->
                 <p><strong>Username:</strong> {{ selectedUser.username }}</p>
                 <p><strong>Email:</strong> {{ selectedUser.email }}</p>
                 <p><strong>First Name:</strong> {{ selectedUser.firstname }}</p>
@@ -200,7 +120,6 @@
             
             <div v-if="showAddress && address" class="p-4 space-y-3 border-t border-gray-300 mt-4">
                 <h3 class="font-bold text-lg">Address Information</h3>
-                <!-- <p><strong>Name:</strong> {{ address.name }}</p> -->
                 <p><strong>Phone Number:</strong> {{ address.phone_number }}</p>
                 <p><strong>House Number:</strong> {{ address.house_number }}</p>
                 <p><strong>Building:</strong> {{ address.building }}</p>

@@ -1,4 +1,5 @@
 <script setup>
+import { ref, onMounted, computed } from "vue";
 
 const userStore = useUser(); // ดึงข้อมูลผู้ใช้
 const orders = ref([]);
@@ -23,7 +24,7 @@ const fetchOrders = async () => {
 // ฟังก์ชันเปลี่ยนสถานะออเดอร์ (ทำได้เฉพาะ DELIVERED -> SUCCEED/FAILED)
 const updateOrderStatus = async (orderId, newStatus) => {
   try {
-    const response = await apiClient.put(`/orders/${orderId}/status`, { status: newStatus });
+    const response = await apiClient.patch(`/orders/${orderId}`, { status: newStatus });
     console.log("Status updated:", response.data);
     await fetchOrders(); // รีโหลดข้อมูลใหม่หลังเปลี่ยนสถานะ
   } catch (error) {
@@ -74,29 +75,33 @@ onMounted(fetchOrders);
             <p class="text-sm text-gray-500">Total Price: {{ order.total_price }} ฿</p>
             <p class="text-sm text-gray-500">Status: <span class="font-bold">{{ order.status || "PENDING" }}</span></p>
         </div>
-        <div>
-                      <!-- Change Status (Only if DELIVERED) -->
-          <div class="mt-4">
-            <label class="block text-sm">Change Status:</label>
-            <select 
-              @change="updateOrderStatus(order.order_id, $event.target.value)" 
-              class="border p-2 w-full rounded"
-              :disabled="order.status !== 'DELIVERED'"
-            >
-              <option v-for="status in ['SUCCEED', 'FAILED']" :key="status" :value="status">
-                {{ status }}
-              </option>
-            </select>
-            <p v-if="order.status !== 'DELIVERED'" class="text-xs text-red-500 mt-1">
+        <div class="space-y-2">
+            <!-- Change Status (Only if DELIVERED) -->
+            <div v-if="order.status === 'DELIVERED'">
+              <p class="font-semibold">Change Order Status:</p>
+              <div class="flex space-x-2">
+                <button
+                  @click="updateOrderStatus(order.order_id, 'SUCCEED')"
+                  class="bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  Mark as Succeed
+                </button>
+                <button
+                  @click="updateOrderStatus(order.order_id, 'FAILED')"
+                  class="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Mark as Failed
+                </button>
+              </div>
+            </div>
+            <p v-else class="text-xs text-red-500 mt-1">
               You can only change the status when the order is DELIVERED.
             </p>
           </div>
-        </div>
 
-        
-        <!-- Detail Section (Show when expanded) -->
-        <div v-if="expandedOrders[order.order_id]" class="mt-3">
-          
+        <!-- Change Status Section -->
+        <div v-if="expandedOrders[order.order_id]" class="mt-4">
+      
           <!-- Product List -->
           <div class="mt-3 space-y-2">
             <h3 class="font-semibold">Products:</h3>
@@ -109,8 +114,6 @@ onMounted(fetchOrders);
               </div>
             </div>
           </div>
-
-
         </div>
 
       </div>

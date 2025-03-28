@@ -1,220 +1,262 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import axios from 'axios';
-    import Report from '@/components/staff/modals/Report.vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
-    definePageMeta({ layout: 'staff' });
 
-    const showSuccessCreateProduct = ref(false);
-    const showSuccessCreateCategory = ref(false);
-    const showSuccessCreateBrand = ref(false);
-    const loading = ref(false);
-    const products = ref([]);
-    const categories = ref([]);
-    const newCategory = ref('');
-    const brands = ref([]);
-    const newBrand = ref('');
-    const newProduct = ref({
-        name: '',
-        description: '',
-        price: '',
-        stock: 0,
-        category_id: '',
-        brand_id: '',
-        image_products: [],
-        rating: 0,
-        accessibility: 'PUBLIC',
+definePageMeta({ layout: 'staff' });
+
+const showSuccessCreateProduct = ref(false);
+const loading = ref(false);
+const categories = ref([]);
+const brands = ref([]);
+const errorMessage = ref('');
+const selectedFiles = ref([]);
+const useRoute = useRouter()
+
+// ข้อมูลผลิตภัณฑ์ใหม่
+const newProduct = ref({
+  name: '',
+  description: '',
+  price: '',
+  stock: 0,
+  category_id: '',
+  brand_id: '',
+  image_products: [],
+  rating: 0,
+  accessibility: 'PUBLIC',
+});
+
+// URL API
+const API_BASE = 'http://localhost/api/products';
+const CATEGORY_API_BASE = 'http://localhost/api/categories';
+const BRAND_API_BASE = 'http://localhost/api/brands';
+const IMAGE_UPLOAD_API = 'http://localhost/api/products/images'; // API สำหรับการอัปโหลดภาพ
+
+// ดึงข้อมูลหมวดหมู่
+const fetchCategories = async () => {
+  try {
+    const response = await axios.get(CATEGORY_API_BASE);
+    categories.value = response.data.data;
+  } catch (error) {
+    console.error('Category Fetch Error:', error.message);
+    errorMessage.value = 'Failed to fetch categories.';
+  }
+};
+
+// ดึงข้อมูลแบรนด์
+const fetchBrands = async () => {
+  try {
+    const response = await axios.get(BRAND_API_BASE);
+    brands.value = response.data.data;
+  } catch (error) {
+    console.error('Brand Fetch Error:', error.message);
+    errorMessage.value = 'Failed to fetch brands.';
+  }
+};
+
+// ฟังก์ชันอัปโหลดภาพ
+const uploadImage = async (productId, imageFile) => {
+  const formData = new FormData();
+  formData.append('image_file', imageFile);
+  formData.append('product_id', productId);
+
+  try {
+    const response = await axios.post(IMAGE_UPLOAD_API, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
-    const selectedFiles = ref([]);
-    const errorMessage = ref('');
 
-    const API_BASE = 'http://localhost/api/products';
-    const CATEGORY_API_BASE = 'http://localhost/api/categories';
-    const BRAND_API_BASE = 'http://localhost/api/brands';
+    return response.data.data; // Assuming the response contains the uploaded image URL or filename
+  } catch (error) {
+    console.error('Image Upload Error:', error.message);
+    errorMessage.value = 'Failed to upload image.';
+    return null;
+  }
+};
 
-    const fetchProducts = async () => {
-        loading.value = true;
-        errorMessage.value = '';
-        try {
-            const response = await axios.get(API_BASE);
-            products.value = response.data.data;
-        } catch (error) {
-            console.error('Fetch Error:', error.message);
-            errorMessage.value = error.message;
-            products.value = [];
-        } finally {
-            loading.value = false;
-        }
-    };
+// สร้างผลิตภัณฑ์
+const createProduct = async () => {
+  if (!newProduct.value.name.trim() || !newProduct.value.price) {
+    errorMessage.value = 'Please fill in required fields.';
+    return;
+  }
 
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get(CATEGORY_API_BASE);
-            categories.value = response.data.data;
-        } catch (error) {
-            console.error('Category Fetch Error:', error.message);
-            errorMessage.value = 'Failed to fetch categories.';
+  try {
+    const response = await axios.post(API_BASE, newProduct.value);
+    if (response.status === 201) {
+      const productId = response.data.data.id;
+      
+      // อัปโหลดภาพทีละไฟล์
+      for (let i = 0; i < selectedFiles.value.length; i++) {
+        const uploadedImage = await uploadImage(productId, selectedFiles.value[i]);
+        if (uploadedImage) {
+          newProduct.value.image_products.push(uploadedImage); // เก็บข้อมูลภาพที่อัปโหลด
         }
-    };
+      }
 
-    const fetchBrands = async () => {
-        try {
-            const response = await axios.get(BRAND_API_BASE);
-            brands.value = response.data;
-        } catch (error) {
-            console.error('Brand Fetch Error:', error.message);
-            errorMessage.value = 'Failed to fetch brands.';
-        }
-    };
+      // อัปเดตข้อมูลผลิตภัณฑ์หลังจากอัปโหลดภาพ
+      await axios.put(`${API_BASE}/${productId}`, newProduct.value);
 
-    const createProduct = async () => {
-        if (!newProduct.value.name.trim() || !newProduct.value.price) {
-            errorMessage.value = 'Please fill in required fields.';
-            return;
-        }
-        try {
-            console.log("New Product: ", newProduct)
-            newProduct.value.image_products = await uploadImages(newProduct.value.id, selectedFiles.value);
-            const response = await axios.post(API_BASE, newProduct.value);
-            if (response.status === 201) {
-                showSuccessCreateProduct.value = true;
-            } else {
-                errorMessage.value = response.data.message || 'Failed to create product.';
-            }
-        } catch (error) {
-            console.error('Create Error:', error.message);
-            errorMessage.value = error.message;
-        }
-    };
-
-    const createCategory = async () => {
-        if (!newCategory.value.trim()) {
-            errorMessage.value = 'Please enter a category name.'
-            return
-        }
-
-        try {
-            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
-            if (response.status === 201) {
-                showSuccessCreateCategory.value = true;
-                categories.value.push(response.data)
-                newCategory.value = ''
-            }
-        } catch (error) {
-            console.error('Create Category Error:', error.message)
-            errorMessage.value = 'Failed to create category.'
-        }
+      showSuccessCreateProduct.value = true;
+      useRoute.push("/staff/product")
+    } else {
+      errorMessage.value = response.data.message || 'Failed to create product.';
     }
+  } catch (error) {
+    console.error('Create Product Error:', error.message);
+    errorMessage.value = error.message;
+  }
+};
 
-    const createBrand = async () => {
-        if (!newBrand.value.trim()) {
-            errorMessage.value = 'Please enter a Brand name.'
-            return
-        }
-
-        try {
-            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
-            if (response.status === 201) { 
-                showSuccessCreateBrand.value = true;   
-                brands.value.push(response.data)
-                newBrand.value = ''
-            }
-        } catch (error) {
-            console.error('Create Brand Error:', error.message)
-            errorMessage.value = 'Failed to create Brand.'
-        }
-    }
-
-    onMounted(() => {
-        fetchProducts();
-        fetchCategories();
-        fetchBrands();
-    });
+// โหลดข้อมูลเมื่อหน้าโหลดเสร็จ
+onMounted(() => {
+  fetchCategories();
+  fetchBrands();
+});
 </script>
 
 <template>
+  <div class="mt-10 mx-16">
+    <h1 class="text-2xl font-bold mb-4">Create Product</h1>
+
+    <!-- Error message -->
     <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
-    <form @submit.prevent="createProduct" class="mt-10 mx-16 w-1/2 space-y-2">
-        <h1 class="text-xl font-bold mb-4">Create New Product</h1>
+    <!-- Success message -->
+    <div v-if="showSuccessCreateProduct" class="text-green-500 mb-4">
+      Product created successfully!
+    </div>
 
-        <p class="font-bold">Product name :</p>
-        <input v-model="newProduct.name" type="text" placeholder="product name" class="border p-2 rounded w-full" required />
-        
-        <p class="font-bold">Description :</p>
-        <textarea v-model="newProduct.description" placeholder="description (optional)" class="border p-2 rounded w-full"></textarea>
-        
-        <p class="font-bold">Price :</p>
-        <input v-model="newProduct.price" type="number" placeholder="price" class="border p-2 rounded w-full" required />
-        
-        <!-- CATEGORY -->
-        <div class="flex gap-2">
-            <p class="font-bold">Category :</p> 
-        </div>
-        <select v-model="newProduct.category_id" class="border p-2 rounded w-full" required>
-            <!-- <li v-for="category in categories" :key="category.id" :value="category.id"> -->
-                <option value="" disabled selected>select a category</option>
-                <option v-for="cate in categories" :key="cate.id" :value="cate.id">
-                    {{ cate.name }}
-                </option>
-            <!-- </li> -->
-        </select>
-        <div class="mt-2">
-            <input v-model="newCategory" type="text" placeholder="add new category name" class="border p-2 rounded w-full" />
-            <button @click.prevent="createCategory" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Category</button>
-        </div>
-        
-        <!-- BRAND -->
-        <p class="font-bold">Brand :</p>
-        <select v-model="newProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
-            <li v-for="brand in brands" :key="brand.id" :value="brand.id">
-                <option value="" disabled selected>select a brand</option>
-                <option v-for="b in brand" :key="b.id" :value="b.id">
-                    {{ b.name }}
-                </option>   
-            </li>
-        </select>
-        <div class="mt-2">
-            <input v-model="newBrand" type="text" placeholder="add new brand name" class="border p-2 rounded w-full" />
-            <button @click.prevent="createBrand" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Brand</button>
+    <div class="bg-white p-4 shadow-md rounded">
+      <form @submit.prevent="createProduct">
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-semibold">Product Name</label>
+          <input
+            type="text"
+            id="name"
+            v-model="newProduct.name"
+            class="w-full p-2 border border-gray-300 rounded"
+            placeholder="Enter product name"
+            required
+          />
         </div>
 
-        <div v-if="selectedFiles.length > 0" class="mt-4">
-            <p class="mb-2">Preview Images:</p>
-            <div class="flex gap-10">
-                <div v-for="(file, index) in selectedFiles" :key="index" class="w-24 h-24">
-                    <img :src="file" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
-                </div>
-            </div>
+        <div class="mb-4">
+          <label for="description" class="block text-sm font-semibold">Description</label>
+          <textarea
+            id="description"
+            v-model="newProduct.description"
+            class="w-full p-2 border border-gray-300 rounded"
+            placeholder="Enter product description"
+            rows="4"
+            required
+          ></textarea>
         </div>
 
-        <p class="font-bold">Privacy :</p>
-        <select v-model="newProduct.accessibility" class="border p-2 rounded w-full">
-            <option value="PUBLIC">public</option>
-            <option value="PRIVATE">private</option>
-        </select>
+        <div class="mb-4 flex gap-4">
+          <div class="w-1/2">
+            <label for="price" class="block text-sm font-semibold">Price</label>
+            <input
+              type="number"
+              id="price"
+              v-model="newProduct.price"
+              class="w-full p-2 border border-gray-300 rounded"
+              placeholder="Enter product price"
+              required
+            />
+          </div>
+          <div class="w-1/2">
+            <label for="stock" class="block text-sm font-semibold">Stock</label>
+            <input
+              type="number"
+              id="stock"
+              v-model="newProduct.stock"
+              class="w-full p-2 border border-gray-300 rounded"
+              placeholder="Enter stock quantity"
+              required
+            />
+          </div>
+        </div>
 
-        <button type="submit" class="bg-green-500 text-white p-2 rounded w-full">Add Product</button>
-    </form>
+        <div class="mb-4">
+          <label for="category_id" class="block text-sm font-semibold">Category</label>
+          <select
+            id="category_id"
+            v-model="newProduct.category_id"
+            class="w-full p-2 border border-gray-300 rounded"
+            required
+          >
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
 
-        <Report 
-            :show="showSuccessCreateProduct" 
-            title="Create Product Completed" 
-            buttonText="Got it!" 
-            @close="showSuccessCreateProduct = false" 
-        />
-        <Report 
-            :show="showSuccessCreateCategory" 
-            title="Create Category Completed" 
-            buttonText="Got it!" 
-            @close="showSuccessCreateCategory = false" 
-        />
-        <Report 
-            :show="showSuccessCreateBrand" 
-            title="Create Brand Completed" 
-            buttonText="Got it!" 
-            @close="showSuccessCreateBrand = false" 
-        />
+        <div class="mb-4">
+          <label for="brand_id" class="block text-sm font-semibold">Brand</label>
+          <select
+            id="brand_id"
+            v-model="newProduct.brand_id"
+            class="w-full p-2 border border-gray-300 rounded"
+            required
+          >
+            <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+              {{ brand.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="rating" class="block text-sm font-semibold">Rating</label>
+          <input
+            type="number"
+            id="rating"
+            v-model="newProduct.rating"
+            class="w-full p-2 border border-gray-300 rounded"
+            placeholder="Enter product rating"
+            min="0"
+            max="5"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="accessibility" class="block text-sm font-semibold">Accessibility</label>
+          <select
+            id="accessibility"
+            v-model="newProduct.accessibility"
+            class="w-full p-2 border border-gray-300 rounded"
+            required
+          >
+            <option value="PUBLIC">Public</option>
+            <option value="PRIVATE">Private</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="image_products" class="block text-sm font-semibold">Product Images</label>
+          <input
+            type="file"
+            id="image_products"
+            @change="selectedFiles = $event.target.files"
+            multiple
+            class="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+
+        <div class="flex gap-4 justify-end">
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+            :disabled="loading"
+          >
+            {{ loading ? 'Creating...' : 'Create Product' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

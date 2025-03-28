@@ -17,7 +17,6 @@ const decreaseQuantity = () => {
 };
 
 const fetchProduct = async () => {
-        console.log(useRoute.params)
         const {product_id} = useRoute().params
         try {
             const response = await apiClient.get(`/products/${product_id}`);
@@ -32,6 +31,7 @@ const fetchProduct = async () => {
         productImages.value = product.value.image_products.map(img => img.image_path)
 
         console.log(productImages)
+
 
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -63,10 +63,9 @@ onMounted(async () => {
     await fetchProduct()
 })
 
-// ใช้ watchEffect เพื่อให้แน่ใจว่าฟังก์ชัน fetchProduct จะทำงานเมื่อ params เปลี่ยน
 watchEffect(() => {
-    fetchProduct();
-});
+    fetchProduct()
+})
 
 
 </script>

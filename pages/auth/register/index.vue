@@ -2,13 +2,13 @@
 
     const router = useRouter();
     const form = ref({  
-    username: 'testt',
-    email: 'test@gmail.com',
-    firstname: 'asd',
-    lastname: 'asd',
-    gender: 'MALE',
-    password: '12345678',
-    confirm_password: '12345678',
+      username: '',
+      email: '',
+      firstname: '',
+      lastname: '',
+      gender: '',
+      password: '',
+      confirm_password: '',
     });
     const errors = ref({});
     const successMessage = ref('');

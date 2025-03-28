@@ -9,6 +9,8 @@ const carts = ref([])
 
 
 
+
+
 const logoutUser = async () => {
     try {
         const response = await apiClient.post('/user/revoke', {}, { headers: {
@@ -23,17 +25,22 @@ const logoutUser = async () => {
     }
 };
 
-onMounted(async () => {
-    await userStore.loadUser();   
-  try {
-
-    if(userStore.isLoggedIn){
+const fetchCart = async () => {
+  if(userStore.isLoggedIn){
         user.value = userStore.userInfo
         const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`, {
         });
         carts.value = cartsResponse.data.data
     }
+}
 
+onMounted(async () => {
+  
+  await userStore.loadUser();   
+
+    
+  try {
+    await fetchCart()
 
     const categoriesResponse = await apiClient.get('/categories');
     categories.value = categoriesResponse.data.data;
@@ -44,6 +51,8 @@ onMounted(async () => {
     console.error('Failed to fetch categories and brands:', error);
   }
 });
+
+
 </script>
 
 
