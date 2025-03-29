@@ -207,7 +207,7 @@ onMounted(() => {
           </select>
         </div>
 
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <label for="rating" class="block text-sm font-semibold">Rating</label>
           <input
             type="number"
@@ -219,7 +219,7 @@ onMounted(() => {
             max="5"
             required
           />
-        </div>
+        </div> -->
 
         <div class="mb-4">
           <label for="accessibility" class="block text-sm font-semibold">Accessibility</label>

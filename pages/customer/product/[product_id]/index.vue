@@ -3,6 +3,7 @@ const userStore = useUser()
 const product = ref(null)
 const quantity = ref(1)
 const productImages = ref([]);
+const router = useRouter()
 
 const increaseQuantity = () => {
     if (quantity.value < product.value.stock) {
@@ -51,6 +52,7 @@ const addToCart = async () => {
 
           // 🔄 รีโหลดข้อมูลสินค้าใหม่หลังจากเพิ่มลงตะกร้า
         await fetchProduct(); 
+        router.push("/customer/product")
         
     } catch (error) {
         console.error('Error adding to cart:', error.response?.data || error.message);

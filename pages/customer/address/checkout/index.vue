@@ -35,7 +35,7 @@ onMounted( async ()=>{
                 <h1 class="card-title font-bold text-lg text-primary">Address List</h1>
 
                 <div class="ml-auto">
-                    <NuxtLink to="/customer/address/create">
+                    <NuxtLink to="/customer/address/checkout/create">
                         <button class="btn btn-outline btn-info">Add new address</button>
                     </NuxtLink>
                 </div>

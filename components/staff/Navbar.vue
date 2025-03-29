@@ -38,7 +38,7 @@
               </NuxtLink>
             </li>
             <li><a>Settings</a></li>
-            <li><NuxtLink :to="`/login`">Logout</NuxtLink></li>
+            <li><NuxtLink :to="`/auth/login`">Logout</NuxtLink></li>
           </ul>
         </div>
       </div>
