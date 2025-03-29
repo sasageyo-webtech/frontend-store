@@ -34,7 +34,10 @@ export default defineNuxtConfig({
   },
   plugins: [
     '~/plugins/pinia.ts' // ลงทะเบียน plugin
-  ]
+  ],
 
+  imports: {
+    dirs: ['types/*.ts', 'store/*.ts', 'types/**/*.ts'],
+  },
   
 })
