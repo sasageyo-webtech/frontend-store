@@ -1,11 +1,15 @@
 <script setup>
 
 const router = useRouter();
-const userStore = useUser()
+const userStore = useUser();
 const user = ref()
 const categories = ref([]);
 const brands = ref([]);
 const carts = ref([])
+
+
+
+
 
 const logoutUser = async () => {
     try {
@@ -21,14 +25,22 @@ const logoutUser = async () => {
     }
 };
 
-onMounted(async () => {
-  userStore.loadUser();
-  if(userStore.isLoggedIn) user.value = userStore.userInfo
+const fetchCart = async () => {
+  if(userStore.isLoggedIn){
+        user.value = userStore.userInfo
+        const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`, {
+        });
+        carts.value = cartsResponse.data.data
+    }
+}
 
+onMounted(async () => {
+  
+  await userStore.loadUser();   
+
+    
   try {
-    const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`, {
-    });
-    carts.value = cartsResponse.data.data
+    await fetchCart()
 
     const categoriesResponse = await apiClient.get('/categories');
     categories.value = categoriesResponse.data.data;
@@ -39,6 +51,8 @@ onMounted(async () => {
     console.error('Failed to fetch categories and brands:', error);
   }
 });
+
+
 </script>
 
 
@@ -107,17 +121,21 @@ onMounted(async () => {
                 fill="none"
                 stroke="currentColor">
               >!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.<path fill="#ffffff" d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/> </svg>
-    
-              <span class="badge badge-sm indicator-item">8</span>
+                <span>
+                    
+                </span>
+              <span class="badge badge-sm indicator-item" :class="{
+                 'hidden': carts.length === 0
+              }">{{ carts.length}}</span>
             </div>
           </div>
           <div
             tabindex="0"
             class="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow">
             <div class="card-body">
-                <div v-for="(cart, index) in carts" :key="index">
+                <div v-for="(cart, index) in carts" :key="index" class="flex justify-between items-center">
                     <span class="text-lg font-bold">{{ cart.product.name}}</span>
-                    <span class="text-info">{{ cart.quantity }}</span>
+                    <span class="text-info">{{ cart.quantity }} pcs</span>
                 </div>
                 <NuxtLink to="/customer/cart" class="card-actions">
                     <button class="btn btn-primary btn-block">View cart</button>
@@ -142,7 +160,7 @@ onMounted(async () => {
                     <NuxtLink to="/customer/profile" class="justify-between"> Profile </NuxtLink>
                 </li>
                 <li><NuxtLink to="/customer/order">My Orders</NuxtLink></li>
-                <li><NuxtLink to="/customer/address/create">My Address</NuxtLink></li>
+                <li><NuxtLink to="/customer/address/">My Address</NuxtLink></li>
 
                 <button @click="logoutUser" class="btn btn-secondary btn-sm text-white px-4 py-2 rounded">
                     Logout

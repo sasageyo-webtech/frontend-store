@@ -4,8 +4,10 @@ import type { User } from 'types/users'
 export const useUser = defineStore('user', {
   state: () => ({
     userInfo: null as User | null,
-    isLoggedIn: false
+    isLoggedIn: false,
+    carts: ref([]),
   }),
+  
   actions: {
     login(user: User) {
       this.userInfo = user
@@ -23,6 +25,7 @@ export const useUser = defineStore('user', {
         this.userInfo = JSON.parse(user) as User
         this.isLoggedIn = true
       }
-    }
+    },
+    
   }
 })

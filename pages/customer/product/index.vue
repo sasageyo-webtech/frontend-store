@@ -7,9 +7,9 @@
 
         <div class="flex">
 
-            <div>
+            <!-- <div>
                 <customerSidebar></customerSidebar>
-            </div>
+            </div> -->
 
            <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
             <div 
@@ -53,7 +53,6 @@
 
 
 <script setup>
-import axios from 'axios';
 
 const products = ref([])
 

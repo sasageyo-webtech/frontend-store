@@ -1,185 +1,128 @@
 <script setup>
-    import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 
-    const orders = ref([ 
-        { id: 1, order_id: "P123",  quantity: 2, total: 99.99, status: "To Approve" },
-        { id: 2, order_id: "P456", quantity: 1, total: 149.50, status: "To Approve" },
-        { id: 3, order_id: "P789", quantity: 3, total: 200.00, status: "To Delivery" },
-        { id: 4, order_id: "P101", quantity: 5, total: 75.25, status: "Succeed" },
-        { id: 5, order_id: "P534", quantity: 2, total: 75.25, status: "Failed" },
-    ]);
+const userStore = useUser(); // ดึงข้อมูลผู้ใช้
+const orders = ref([]);
+const selectedStatus = ref(""); // สถานะที่ใช้กรอง
+const expandedOrders = ref({}); // เก็บสถานะเปิด/ปิดของแต่ละออเดอร์
+const statusOptions = ["PENDING", "APPROVED", "DELIVERED", "SUCCEED", "FAILED"]; // รายการสถานะทั้งหมด
 
-    const statusOptions = ["To Approve", "To Delivery", "Succeed", "Failed"];
-    const activeTab = ref("All");
-    const errorMessage = ref("");
+const fetchOrders = async () => {
+  try {
+    const response = await apiClient.get(`/customers/orders/${userStore.userInfo.customer_id}`);
+    orders.value = response.data.data; 
+    console.log("Orders:", orders.value);
+    // กำหนดค่าเริ่มต้นให้ทุกออเดอร์ปิดอยู่
+    orders.value.forEach(order => {
+      expandedOrders.value[order.order_id] = false;
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  }
+};
 
-    const filteredOrders = () => {
-        return activeTab.value === "All"
-            ? orders.value
-            : orders.value.filter((order) => order.status === activeTab.value);
-    };
+// ฟังก์ชันเปลี่ยนสถานะออเดอร์ (ทำได้เฉพาะ DELIVERED -> SUCCEED/FAILED)
+const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    const response = await apiClient.patch(`/orders/${orderId}`, { status: newStatus });
+    console.log("Status updated:", response.data);
+    await fetchOrders(); // รีโหลดข้อมูลใหม่หลังเปลี่ยนสถานะ
+  } catch (error) {
+    console.error("Error updating order status:", error);
+  }
+};
 
+// ฟังก์ชัน Toggle เปิด/ปิดรายละเอียดสินค้า
+const toggleDetails = (orderId) => {
+  expandedOrders.value[orderId] = !expandedOrders.value[orderId];
+};
+
+// กรองออเดอร์ตามสถานะที่เลือก
+const filteredOrders = computed(() => {
+  return selectedStatus.value
+    ? orders.value.filter(order => order.status === selectedStatus.value)
+    : orders.value;
+});
+
+onMounted(fetchOrders);
 </script>
 
 <template>
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4">My Orders</h1>
 
-    <div class="mt-10 mx-16">
-        <h1 class="text-2xl font-bold mb-4">Order List</h1>
-
-        <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
-
-
-        <div class="flex gap-4 mb-4">
-        <button
-            v-for="status in ['All', ...statusOptions]"
-            :key="status"
-            @click="activeTab = status"
-            class="p-2 px-4 rounded border transition"
-            :class="{
-            'bg-blue-500 text-white': activeTab === status,
-            'bg-gray-200 hover:bg-gray-800 hover:text-white': activeTab !== status
-            }"
-        >
-            {{ status }}
-        </button>
-        </div>
-
-
-
-        <div class="bg-white p-4 shadow-md rounded">
-            <table class="w-full border-collapse border border-gray-300">
-
-
-                <thead>
-                <tr class="bg-gray-100">
-                    <th class="p-2 border">Order ID</th>
-                    <th class="p-2 border">Product ID</th>
-                    <th class="p-2 border">Quantity</th>
-                    <th class="p-2 border">Total</th>
-                    <th class="p-2 border">Status</th>
-                </tr>
-                </thead>
-
-
-                <tbody>
-                <tr v-for="order in filteredOrders()" :key="order.id" class="hover:bg-gray-100">
-                    <td class="p-2 border text-center">{{ order.id }}
-
-
-                        
-                    </td>
-                    <td class="p-2 border text-center">{{ order.product_id }}</td>
-                    <td class="p-2 border text-center">{{ order.quantity }}</td>
-                    <td class="p-2 border text-center">${{ order.total.toFixed(2) }}</td>
-                    <td class="p-2 border text-center">
-
-                    <span class="font-bold" :class="{
-                        'text-blue-500': order.status === 'To Approve',
-                        'text-green-500': order.status === 'Succeed',
-                        'text-yellow-500': order.status === 'To Delivery',
-                        'text-red-500': order.status === 'Failed',
-                        // 'text-gray-500': order.status === 'Succeed'
-                    }">
-                        {{ order.status }}
-                    </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card card-body bg-slate-100 p-6 flex flex-col min-h-full">
-                    <div class="overflow-x-auto flex-grow">
-                        <table class="table">
-                            <!-- head -->
-                            <thead>
-                                <tr>
-                                    <th>Products</th>
-                                    <th>Price / Unit</th>
-                                    <th>Amount</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- row 1 -->
-                                <tr class="bg-base-100">
-                                    <td>
-                                        <div class="flex items-center gap-3">
-                                            <div class="avatar">
-                                                <div class="mask mask-squircle h-12 w-12">
-                                                    <img src="https://img.daisyui.com/images/profile/demo/3@94.webp"
-                                                        alt="Avatar Tailwind CSS Component" />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div class="font-bold">Hart Hagerty</div>
-                                                <div class="text-sm opacity-50">United States</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-ghost badge-m">189 ฿</span></td>
-                                    <td>1</td>
-                                    <th><div class="badge badge-outline badge-ghost">189 ฿</div></th>
-                                </tr>
-                                <!-- row 2 -->
-                                <tr class="bg-base-100">
-                                    <td>
-                                        <div class="flex items-center gap-3">
-                                            <div class="avatar">
-                                                <div class="mask mask-squircle h-12 w-12">
-                                                    <img src="https://img.daisyui.com/images/profile/demo/3@94.webp"
-                                                        alt="Avatar Tailwind CSS Component" />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div class="font-bold">Hart Hagerty</div>
-                                                <div class="text-sm opacity-50">United States</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-ghost badge-m">100 ฿</span></td>
-                                    <td>1</td>
-                                    <th><div class="badge badge-outline badge-ghost">100 ฿</div></th>
-                                </tr>
-                            </tbody>
-
-                            <!-- foot -->
-                            <tfoot>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th class="py-4">Delivery Fee</th>
-                                    <th><span class="badge">45 ฿</span></th>
-                                </tr>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>
-                                        <div class="pb-3">Total Price</div>
-                                        <div class="badge badge-soft badge-success text-white">334 ฿</div>
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <!-- Filter Section -->
+    <div class="mb-4">
+      <label class="mr-2">Filter by Status:</label>
+      <select v-model="selectedStatus" class="border p-2 rounded">
+        <option value="">All</option>
+        <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
+      </select>
     </div>
+
+    <!-- Order List -->
+    <div class="grid grid-cols-1 gap-6">
+      <div v-for="order in filteredOrders" :key="order.order_id" class="bg-white p-4 rounded shadow">
+        
+        <!-- Header Order -->
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-semibold">Order #{{ order.order_id }}</h2>
+          <button @click="toggleDetails(order.order_id)" class="text-blue-500">
+            {{ expandedOrders[order.order_id] ? "Hide Details" : "View Details" }}
+          </button>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Total Price: {{ order.total_price }} ฿</p>
+            <p class="text-sm text-gray-500">Status: <span class="font-bold">{{ order.status || "PENDING" }}</span></p>
+        </div>
+        <div class="space-y-2">
+            <!-- Change Status (Only if DELIVERED) -->
+            <div v-if="order.status === 'DELIVERED'">
+              <p class="font-semibold">Change Order Status:</p>
+              <div class="flex space-x-2">
+                <button
+                  @click="updateOrderStatus(order.order_id, 'SUCCEED')"
+                  class="bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  Mark as Succeed
+                </button>
+                <button
+                  @click="updateOrderStatus(order.order_id, 'FAILED')"
+                  class="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Mark as Failed
+                </button>
+              </div>
+            </div>
+            <p v-else class="text-xs text-red-500 mt-1">
+              You can only change the status when the order is DELIVERED.
+            </p>
+          </div>
+
+        <!-- Change Status Section -->
+        <div v-if="expandedOrders[order.order_id]" class="mt-4">
+      
+          <!-- Product List -->
+          <div class="mt-3 space-y-2">
+            <h3 class="font-semibold">Products:</h3>
+            <div v-for="product in order.products" :key="product.product_id" class="flex items-center border-b pb-2">
+              <img :src="product.image_path" alt="Product Image" class="w-16 h-16 object-cover rounded-md">
+              <div class="ml-3">
+                <p class="text-sm font-semibold">{{ product.name }}</p>
+                <p class="text-xs text-gray-600">Quantity: {{ product.quantity }}</p>
+                <p class="text-xs text-gray-600">Total: {{ product.total_price }} ฿</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
+.container {
+  max-width: 900px;
+}
 </style>

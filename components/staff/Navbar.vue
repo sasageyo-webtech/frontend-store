@@ -16,9 +16,9 @@
 
       <div class="flex-none pr-7 ml-auto space-x-10">
 
-        <NuxtLink to="/customer">             
+        <!-- <NuxtLink to="/customer">             
         <button class="btn btn-secondary"> Go to Customer's Website </button>
-        </NuxtLink>
+        </NuxtLink> -->
 
         <div class="dropdown dropdown-end">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
