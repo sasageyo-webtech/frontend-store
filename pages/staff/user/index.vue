@@ -1,78 +1,92 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+    import { ref, onMounted } from 'vue';
+    import { useRouter } from 'vue-router';
+    import axios from 'axios';
 
-definePageMeta({
-    layout: 'staff',
-});
+    definePageMeta({
+        layout: 'staff',
+    });
 
-const router = useRouter();
+    const router = useRouter();
 
-const users = ref([]);
-const selectedUser = ref(null);
-const loading = ref(false);
-const errorMessage = ref('');
-const showAddress = ref(false);
-const address = ref(null);
-const API_BASE = 'http://localhost/api/users';
-const API_ADDRESS = 'http://localhost/api/address-customers';
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const itemsPerPage = 10;
 
-// Function to fetch users
-const fetchUsers = async () => {
-    loading.value = true;
-    errorMessage.value = '';
-    try {
-        const response = await axios.get(API_BASE);
-        if (response.data.data) {
-            users.value = response.data.data;
-        } else {
-            errorMessage.value = 'Failed to fetch users: Invalid data format.';
+    const users = ref([]);
+    const selectedUser = ref(null);
+
+    const loading = ref(false);
+    const errorMessage = ref('');
+    const showAddress = ref(false);
+    const address = ref(null);
+
+    const API_BASE = 'http://localhost/api/users';
+    const API_ADDRESS = 'http://localhost/api/address-customers';
+
+    const fetchUsers = async (page = 1) => {
+        loading.value = true;
+        errorMessage.value = '';
+        try {
+            const response = await axios.get(API_BASE, {
+                params: {page, limit: itemsPerPage}
+            });
+
+            if (response.data.data) {
+                users.value = response.data.data;
+                console.log("User : ", response.data.data)
+                console.log("Total : ", response.data.total)
+                totalPages.value = Math.ceil(response.data.total / itemsPerPage);
+            } else {
+                errorMessage.value = 'Failed to fetch users: Invalid data format.';
+            }
+        } catch (error) {
+            errorMessage.value = `Failed to fetch users: ${error.message}`;
+        } finally {
+            loading.value = false;
         }
-    } catch (error) {
-        errorMessage.value = `Failed to fetch users: ${error.message}`;
-    } finally {
-        loading.value = false;
-    }
-};
+    };
 
-// Function to select a user and fetch their address
-const selectUser = (user) => {
-    selectedUser.value = { ...user };
-    fetchAddress(user.customer_id);
-};
+    
+    const changePage = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages.value) {
+            currentPage.value = newPage;
+            fetchUsers(newPage);
+        }
+    };
 
-// Function to fetch the user's address
-const fetchAddress = async (userId) => {
-    try {
-        const response = await axios.get(`${API_ADDRESS}?customer_id=${userId}`);
-        if (response.data) {
-            address.value = response.data.data[0];
-        } else {
+    const selectUser = (user) => {
+        selectedUser.value = { ...user };
+        fetchAddress(user.customer_id);
+    };
+
+    const fetchAddress = async (userId) => {
+        try {
+            const response = await axios.get(`${API_ADDRESS}?customer_id=${userId}`);
+            if (response.data) {
+                address.value = response.data.data[0];
+            } else {
+                address.value = null;
+            }
+        } catch (error) {
             address.value = null;
+            console.error('Error fetching address:', error);
         }
-    } catch (error) {
-        address.value = null;
-        console.error('Error fetching address:', error);
-    }
-};
+    };
 
-// Toggle the display of the address information
-const toggleAddress = () => {
-    showAddress.value = !showAddress.value;
-};
+    const toggleAddress = () => {
+        showAddress.value = !showAddress.value;
+    };
 
-// Navigate to the user's orders page
-const goToUserOrders = () => {
-    if (selectedUser.value) {
-        router.push(`/staff/user/order/${selectedUser.value.customer_id}`);
-    }
-};
+    const goToUserOrders = () => {
+        if (selectedUser.value) {
+            router.push(`/staff/user/order/${selectedUser.value.customer_id}`);
+        }
+    };
 
-// On component mount, fetch users
-onMounted(() => {
-    fetchUsers();
-});
+    onMounted(() => {
+        fetchUsers();
+    });
 </script>
 
 <template>
@@ -91,6 +105,19 @@ onMounted(() => {
                     </div>
                 </li>
             </ul>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-center mt-4 space-x-2">
+                <button @click="changePage(currentPage - 1)" class="px-4 py-2 bg-gray-300 hover:bg-gray-700 hover:text-white rounded border border-[rgba(0,0,0,0.1)]">
+                    Prev
+                </button>
+
+                <span class="px-4 py-2" >{{ currentPage }} / {{ totalPages }}</span>
+
+                <button @click="changePage(currentPage + 1)" class="px-4 py-2 bg-gray-300 hover:bg-gray-700 hover:text-white rounded border border-[rgba(0,0,0,0.1)]">
+                    Next
+                </button>
+            </div>
         </div>
 
         <div v-if="selectedUser" class="w-1/2 h-fit p-6 mt-12 border border-gray-300 rounded shadow-md">
