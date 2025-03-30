@@ -44,6 +44,15 @@ const filteredOrders = computed(() => {
     : orders.value;
 });
 
+// กำหนดสีของสถานะ
+const statusClasses = {
+  PENDING: "text-gray-500 bg-gray-200",
+  APPROVED: "text-blue-500 bg-blue-200",
+  DELIVERED: "text-yellow-500 bg-yellow-200",
+  SUCCEED: "text-green-500 bg-green-200",
+  FAILED: "text-red-500 bg-red-200"
+};
+
 onMounted(fetchOrders);
 </script>
 
@@ -66,42 +75,51 @@ onMounted(fetchOrders);
         
         <!-- Header Order -->
         <div class="flex justify-between items-center">
-          <h2 class="text-lg font-semibold">Order #{{ order.order_id }}</h2>
+          <h2 class="text-lg font-semibold">Order {{ order.order_id }}</h2>
+          <p class="text-sm font-bold px-2 py-1 rounded inline" :class="statusClasses[order.status]">
+            Status: {{ order.status || "PENDING" }}
+          </p>
+
+          <div>
+         
+
+        </div>
+
           <button @click="toggleDetails(order.order_id)" class="text-blue-500">
             {{ expandedOrders[order.order_id] ? "Hide Details" : "View Details" }}
           </button>
         </div>
         <div>
-            <p class="text-sm text-gray-500">Total Price: {{ order.total_price }} ฿</p>
-            <p class="text-sm text-gray-500">Status: <span class="font-bold">{{ order.status || "PENDING" }}</span></p>
+          <p class="text-sm text-gray-500">Total Price: {{ order.total_price }} ฿</p>
+
         </div>
         <div class="space-y-2">
-            <!-- Change Status (Only if DELIVERED) -->
-            <div v-if="order.status === 'DELIVERED'">
-              <p class="font-semibold">Change Order Status:</p>
-              <div class="flex space-x-2">
-                <button
-                  @click="updateOrderStatus(order.order_id, 'SUCCEED')"
-                  class="bg-green-500 text-white px-4 py-2 rounded"
-                >
-                  Mark as Succeed
-                </button>
-                <button
-                  @click="updateOrderStatus(order.order_id, 'FAILED')"
-                  class="bg-red-500 text-white px-4 py-2 rounded"
-                >
-                  Mark as Failed
-                </button>
-              </div>
+          <!-- Change Status (Only if DELIVERED) -->
+          <div v-if="order.status === 'DELIVERED'">
+            <p class="font-semibold pt-5">Change Order Status:</p>
+            <div class="flex space-x-2">
+              <button
+                @click="updateOrderStatus(order.order_id, 'SUCCEED')"
+                class="btn btn-outline btn-success text-white px-4 py-2 rounded hover:text-white"
+              >
+                Mark as Succeed
+              </button>
+              <button
+                @click="updateOrderStatus(order.order_id, 'FAILED')"
+                class="btn btn-outline btn-error text-white px-4 py-2 rounded"
+              >
+                Mark as Failed
+              </button>
             </div>
-            <p v-else class="text-xs text-red-500 mt-1">
-              You can only change the status when the order is DELIVERED.
-            </p>
           </div>
+          <p v-else class="text-xs text-blue-800 mt-1">
+            You can only change the status when the order is DELIVERED.
+          </p>
+        </div>
 
         <!-- Change Status Section -->
         <div v-if="expandedOrders[order.order_id]" class="mt-4">
-      
+          
           <!-- Product List -->
           <div class="mt-3 space-y-2">
             <h3 class="font-semibold">Products:</h3>
@@ -115,7 +133,6 @@ onMounted(fetchOrders);
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>

@@ -14,18 +14,18 @@
     const successMessage = ref('');
 
     const formFields = {
-    username: { label: 'Username', type: 'text', placeholder: 'Enter username' },
-    email: { label: 'Email', type: 'email', placeholder: 'Enter email' },
-    firstname: { label: 'First Name', type: 'text', placeholder: 'Enter first name' },
-    lastname: { label: 'Last Name', type: 'text', placeholder: 'Enter last name' },
-    gender: { label: 'Gender', type: 'text', placeholder: 'Enter gender' },
-    password: { label: 'Password', type: 'password', placeholder: 'Enter password' },
-    confirm_password: { label: 'Confirm Password', type: 'password', placeholder: 'Confirm password' },
+      username: { label: 'Username', type: 'text', placeholder: 'Enter username' },
+      email: { label: 'Email', type: 'email', placeholder: 'Enter email' },
+      firstname: { label: 'First Name', type: 'text', placeholder: 'Enter first name' },
+      lastname: { label: 'Last Name', type: 'text', placeholder: 'Enter last name' },
+      gender: { label: 'Gender', type: 'text', placeholder: 'Enter gender' },
+      password: { label: 'Password', type: 'password', placeholder: 'Enter password' },
+      confirm_password: { label: 'Confirm Password', type: 'password', placeholder: 'Confirm password' },
     };
 
     const register = async () => {
-  errors.value = {};
-  successMessage.value = '';
+      errors.value = {};
+      successMessage.value = '';
 
   try {
     const response = await apiClient.post('/users/register', {

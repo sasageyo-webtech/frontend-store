@@ -5,6 +5,7 @@ const customer_address = ref({})
 const hasAddress = ref()
 const imageFile = ref(null) 
 const router = useRouter()
+const errorMessage = ref()
 
 const fetchCarts = async () => {
     const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
@@ -42,7 +43,6 @@ const handleFileChange = (event) => {
 };
 
 
-// Function to send the order creation request
 const createOrder = async () => {
     if (!imageFile.value) {
         alert("Please upload the QR code image.");
@@ -54,21 +54,41 @@ const createOrder = async () => {
     formData.append('address_customer_id', customer_address.value.customer_address_id);
     formData.append('image_receipt_path', imageFile.value);
 
-    console.log(userStore.userInfo.customer_id ,customer_address.value.customer_address_id,  imageFile.value)
-
     try {
         const response = await apiClient.post('/customers/orders', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
-        console.log("Order created successfully", response.message);
-        router.push('/customer/order')
-        // Handle response or redirect to a success page
+
+        // ตรวจสอบสถานะ HTTP Response
+        if (response.status === 201 || response.status === 200) {
+            alert("Order created successfully!");
+            console.log("Order created successfully", response.data);
+            router.push('/customer/order');
+        } else {
+            throw new Error(response.data.message || "Failed to create order");
+        }
     } catch (error) {
-        console.error("Error creating order", error);
+        if (error.response) {
+            // มี response จากเซิร์ฟเวอร์
+            if (error.response.status === 400) {
+                alert(`Error: ${error.response.data.message || "Invalid request"}`);
+            } else if (error.response.status === 404) {
+                alert("Error: Customer not found");
+            } else {
+                alert(`Unexpected error: ${error.response.data.message || "Please try again later."}`);
+            }
+            console.error("API Error:", error.response.data);
+        } else if (error.request) {
+            // ไม่มี response จากเซิร์ฟเวอร์ (อาจเป็นปัญหาการเชื่อมต่อ)
+            alert("Network error: Please check your internet connection.");
+            console.error("Network Error:", error.request);
+        } else {
+            // Error ที่เกิดขึ้นจาก JavaScript เอง
+            alert(`Error: ${error.message}`);
+            console.error("Client Error:", error.message);
+        }
     }
-}
-
-
+};
 
 onMounted(async () => {
     await userStore.loadUser()

@@ -2,19 +2,19 @@
     <div class="p-10">
         <div class="flex justify-between">
             <strong class="text-xl font-semibold align-baseline">All Products</strong>
-            <Searchbar></Searchbar>
+            <input 
+                v-model="searchQuery" 
+                @input="searchProducts"
+                placeholder="Search products..." 
+                class="input input-bordered w-60"
+            />
         </div>
 
-        <div class="flex">
-
-            <!-- <div>
-                <customerSidebar></customerSidebar>
-            </div> -->
-
+        <div class="">
            <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
             <div 
             
-                class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg" 
+                class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg hover:bg-gray-200 duration-300" 
                 v-for="(product, index) in products" 
                 :key="index">
 
@@ -31,9 +31,9 @@
             
                         <div class="flex place-content-between">
                             <div class=""> {{ product.price }} ฿</div>
-                            <div class="card-actions">
+                            <!-- <div class="card-actions">
                                 <button class="btn btn-primary text-[10px] rounded-[30px] ">Add to Cart</button>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
@@ -55,6 +55,7 @@
 <script setup>
 
 const products = ref([])
+const searchQuery = ref('')
 
 useHead({
     title: "All product",
@@ -80,8 +81,25 @@ const fetchProducts = async () => {
   }
 };
 
+const searchProducts = async () => {
+    if (!searchQuery.value) {
+        fetchProducts(); // โหลดสินค้าปกติถ้าช่องค้นหาว่าง
+        return;
+    }
+
+    try {
+        const response = await apiClient.get('/products/search', {
+            params: { query: searchQuery.value }
+        });
+        products.value = response.data.data;
+    } catch (error) {
+        console.error('Error searching products:', error);
+    }
+};
+
 watchEffect(() => {
   fetchProducts();
+  
 }, { flush: 'post' });
 
 // onMounted(fetchProducts)

@@ -1,76 +1,138 @@
+<script setup>
+import { UserRole } from '~/types/users'
+import { useUser } from '~/stores/useUser'
+
+const router = useRouter()
+const userStore = useUser()
+const name = ref('')
+const phone_number = ref('')
+const house_number = ref('')
+const building = ref('')
+const street = ref('')
+const sub_district = ref('')
+const district = ref('')
+const province = ref('')
+const country = ref('')
+const postal_code = ref('')
+const detail_address = ref('')
+const errorMessage = ref('')
+const loading = ref(false)
+
+
+
+const createAddress = async () => {
+    errorMessage.value = ''
+    if (!name.value || !phone_number.value || !house_number.value || !building.value || !street.value 
+        || !sub_district.value || !district.value || !province.value || !country.value || !postal_code.value || !detail_address.value )
+        {
+        errorMessage.value = 'Please enter both email and password.'
+        return
+    }
+    try {
+        loading.value = true
+        const user = userStore.userInfo
+        console.log(5)
+        
+        const response = await apiClient.post('/address-customers   ', {
+            customer_id: user.customer_id,
+            name: name.value,
+            phone_number: phone_number.value,
+            house_number: house_number.value,
+            building: building.value,
+            street: street.value,
+            sub_district: sub_district.value,
+            district: district.value,
+            province: province.value,
+            country: country.value,
+            postal_code: postal_code.value,
+            detail_address: detail_address.value
+        });
+        console.log(response.data)
+        
+        router.push('/customer/address')
+
+    } catch (error) {
+        errorMessage.value = error.message
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(async () => {
+    await userStore.loadUser()
+})
+</script>
+
 <template>
     <div>
-        <NuxtLink to="/customer/address/" class="flex mx-20 mt-5">
+        <NuxtLink to="/customer/address" class="flex mx-20 mt-5">
             <svgLess></svgLess>
             <span>Back</span>
         </NuxtLink>
-
         <br>
-
         <div class="grid gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg mx-20">
-
                 <h1 class="card-title font-bold text-lg text-primary">
                         Address List
                 </h1>   
-
-                <form class="space-y-4">
+                <form @submit.prevent="createAddress" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium">Name</label>
-                        <input type="text" placeholder="name"  class="input input-bordered w-full" />
+                        <input v-model="name" 
+                        class="input input-bordered w-full">
                     </div>
                     <div>
                         <label class="block text-sm font-medium">Phone Number</label>
-                        <input type="text" placeholder="xxx-xxxx-xxx" class="input input-bordered w-full" />
+                        <input v-model="phone_number" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">House Number</label>
-                        <input type="text" placeholder="456" class="input input-bordered w-full" />
+                        <input v-model="house_number" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-medium">Building (Optional)</label>
-                        <input type="text" class="input input-bordered w-full" placeholder="Enter building name (if any)" />
+                        <label class="block text-sm font-medium">Building</label>
+                        <input v-model="building" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">Street</label>
-                        <input type="text" placeholder="Second St" class="input input-bordered w-full" />
+                        <input v-model="street" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">Sub District</label>
-                        <input type="text" placeholder="Sub District" class="input input-bordered w-full" />
+                        <input v-model="sub_district" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">District</label>
-                        <input type="text" placeholder="District" class="input input-bordered w-full" />
+                        <input v-model="district" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">Province</label>
-                        <input type="text" placeholder="Province" class="input input-bordered w-full" />
+                        <input v-model="province" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">Country</label>
-                        <input type="text" placeholder="Country" class="input input-bordered w-full" />
+                        <input v-model="country" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
                         <label class="block text-sm font-medium">Postal Code</label>
-                        <input type="text" placeholder="54321" class="input input-bordered w-full" />
+                        <input v-model="postal_code" 
+                        class="input input-bordered w-full">
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-medium">Detail Address (Optional)</label>
-                        <input type="text" class="input input-bordered w-full" placeholder="Enter additional details (if any)" />
+                        <label class="block text-sm font-medium">Detail Address</label>
+                        <input v-model="detail_address" 
+                        class="input input-bordered w-full">
                     </div>
                     
-                    <NuxtLink :to="`/customer/address/`">
-                       <button type="submit" class="btn btn-primary w-full">Save</button> 
-                    </NuxtLink>
+                    <button type="submit" class="btn btn-primary w-full">Save</button> 
+          
                     
                 </form>
 </div>

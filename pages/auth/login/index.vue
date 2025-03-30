@@ -30,14 +30,18 @@ const loginUser = async () => {
             userStore.login(user)
             
             if(user.role == UserRole.CUSTOMER) router.push('/')
-            if(user.role == UserRole.STAFF) router.push('/staff')
+            if(user.role == UserRole.STAFF) router.push('/staff/user')
 
         } else {
             errorMessage.value = 'Login failed. Please check your credentials.'
         }
 
     } catch (error) {
-        errorMessage.value = error.message
+        if(error.response){
+            errorMessage.value = error.response.data.message
+        }else{
+            errorMessage.value = error.message
+        }
     } finally {
         loading.value = false
 }
