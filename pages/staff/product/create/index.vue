@@ -256,7 +256,7 @@
                     </select>
                 </div>
 
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                     <label for="image_products" class="block text-sm font-semibold">Product Images</label>
                     <input
                         type="file"
@@ -265,7 +265,7 @@
                         multiple
                         class="w-full p-2 border border-gray-300 rounded"
                     />
-                </div>
+                </div> -->
 
                 <div class="flex gap-4 justify-end">
                     <button

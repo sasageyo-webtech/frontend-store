@@ -244,7 +244,7 @@
                 <!-- PICTURE -->
                 <p class="font-bold">Picture :</p>
                 <div class="flex justify-between items-center gap-10">
-                    <div class="relative border border-black border-1 rounded-md p-2 pt-3 w-fit">
+                    <div class="relative border border-black border-1 rounded-md p-2 pt-3 w-    ">
                         <input type="file" multiple @change="handleImageUpload" id="image-upload"/>
                         <label for="image-upload" class="py-2 px-5 bg-blue-400 hover:bg-blue-700 text-white text-sm rounded-lg text-lg ">
                             Choose Image(s)
