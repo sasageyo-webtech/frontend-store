@@ -6,7 +6,9 @@
     definePageMeta({ layout: "staff" });
 
     const route = useRoute();
-    const userId = ref(route.params.id);
+    const customerId = ref(route.params.id);
+    const username = ref(route.query.username || "-");
+
     const orders = ref([]);
     const statusOptions = ["All", "Pending", "Approved", "Delivered", "Succeed", "Failed"];
     const activeTab = ref("All");
@@ -21,7 +23,7 @@
 
         try {
             const response = await axios.get(API_ORDERS, {
-                params: { customer_id: userId.value },
+                params: { customer_id: customerId.value },
             });
 
             if (response.data.data) {
@@ -51,7 +53,7 @@
 
 <template>
     <div class="mt-10 mx-16">
-        <h1 class="text-2xl font-bold mb-4">Orders for User {{ userId }}</h1>
+        <h1 class="text-2xl font-bold mb-4">Orders for Customer {{ username }}</h1>
 
         <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
@@ -99,6 +101,6 @@
             </table>
         </div>
 
-        <div v-else class="text-gray-500">No orders found for this user.</div>
+        <div v-else class="text-gray-500">No orders found for this customer.</div>
     </div>
 </template>
