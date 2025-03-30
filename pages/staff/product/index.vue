@@ -294,7 +294,10 @@
                 </div>
 
                 <!-- BRAND -->
-                <p class="font-bold">Brand :</p>
+                <div class="flex gap-2">
+                    <p class="font-bold">Brand :</p>
+                    <p> {{ selectedProduct.brand.name }}</p>
+                </div>
                 <select v-model="selectedProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
                     <option v-for="brand in brands" :key="brand.id" :value="brand.id">
                         {{ brand.name }}
