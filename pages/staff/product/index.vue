@@ -15,7 +15,7 @@
 
     const currentPage = ref(1);
     const totalPages = ref(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
 
     const products = ref([])
     const categories = ref([])
@@ -43,9 +43,9 @@
                 params: { page, limit: itemsPerPage }
             });
 
-            if (response.data.data) {
-                products.value = response.data.data.data
-                totalPages.value = Math.ceil(response.data.total / itemsPerPage);
+            if (response.data) {
+                products.value = response.data.data
+                totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
             } else {
                 errorMessage.value = 'Invalid data format.';
                 products.value = [];
