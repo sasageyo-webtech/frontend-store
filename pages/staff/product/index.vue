@@ -12,18 +12,23 @@
     const showSuccessCreateBrand = ref(false);
     const showSuccessUpdateProduct = ref(false);
     const showSuccessDeleteProduct = ref(false);
-    const products = ref([])
+
     const currentPage = ref(1);
     const totalPages = ref(1);
     const itemsPerPage = 10;
+
+    const products = ref([])
     const categories = ref([])
     const newCategory = ref('')
     const brands = ref([])
     const newBrand = ref('')
+
     const selectedFiles = ref([])
     const selectedProduct = ref(null);
+
     const loading = ref(false)
     const errorMessage = ref('')
+
     const API_BASE = 'http://localhost/api/products'
     const CATEGORY_API_BASE = 'http://localhost/api/categories'
     const BRAND_API_BASE = 'http://localhost/api/brands'
@@ -40,7 +45,6 @@
 
             if (response.data.data) {
                 products.value = response.data.data.data
-                console.log("Response : ", response.data)
                 totalPages.value = Math.ceil(response.data.total / itemsPerPage);
             } else {
                 errorMessage.value = 'Invalid data format.';
@@ -60,7 +64,6 @@
             fetchProducts(newPage);
         }
     };
-
 
     const fetchCategories = async () => {
         try {
