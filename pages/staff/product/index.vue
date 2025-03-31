@@ -1,7 +1,8 @@
 <script setup>
     import { ref, onMounted } from 'vue';
     import axios from 'axios';
-    import Report from '@/components/staff/modals/Report.vue';
+    import ReportSuccess from '@/components/staff/modals/ReportSuccess.vue';
+    import ReportFailed from '@/components/staff/modals/ReportFailed.vue';
 
     definePageMeta({
         layout: 'staff',
@@ -12,12 +13,19 @@
     const showSuccessCreateBrand = ref(false);
     const showSuccessUpdateProduct = ref(false);
     const showSuccessDeleteProduct = ref(false);
+    const showSuccessAddStock = ref(false);
+
+    const showFailAddStockQuantity = ref(false);
+
+    const showStockModal = ref(false);
 
     const currentPage = ref(1);
     const totalPages = ref(1);
     const itemsPerPage = 20;
 
     const products = ref([])
+    const stockInput = ref(null);
+    const selectedProductForStock = ref(null);
     const categories = ref([])
     const newCategory = ref('')
     const brands = ref([])
@@ -177,6 +185,7 @@
     };
 
     const deleteProduct = async (id) => {
+        // console.log("Response delete: ", id)
         try {
             const response = await axios.delete(`${API_BASE}/${id}`);
             if (response.status === 200) {
@@ -194,6 +203,34 @@
         }
     };
 
+    const addStock = async () => {
+        if (!selectedProductForStock.value || stockInput.value < 0) {
+            showFailAddStockQuantity.value = true;
+            return;
+        }
+
+        try {
+            const response = await axios.patch(`http://localhost/api/products/${selectedProductForStock.value.id}/add-stock`, {
+                amount: stockInput.value
+            });
+
+            if (response.status === 200) {
+                showSuccessAddStock.value = true;
+                selectedProductForStock.value.stock = stockInput.value;
+                showStockModal.value = false;
+            }
+        } catch (error) {
+            console.error('Stock Update Error:', error.message);
+            alert('Failed to update stock.');
+        }
+    };
+
+    const openStockModal = (product) => {
+        selectedProductForStock.value = product;
+        stockInput.value = 0;
+        showStockModal.value = true;
+    };
+
     onMounted(() => {
         fetchProducts()
         fetchCategories()
@@ -203,25 +240,30 @@
 
 <template>
     <div class="mt-10 mx-16 flex gap-10">
-        <div class="w-1/3">
+        <div class="w-1/2">
             <h1 class="text-2xl font-bold mb-4">Product List</h1>
 
-            <!-- <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div> -->
+            <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
             <div v-if="loading" class="text-gray-500">Loading products...</div>
             <ul v-else> 
                 <li :key="index" v-for="(prod, index) in products" 
                     @click="selectProduct(prod)" 
                     class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-[rgba(0,0,0,0.1)] shadow-xl rounded">
+                    
                     <div class="flex items-center">
-                        <img :src="prod.image_products?.[0]?.image_path || 'default-image.jpg'" alt="Product Image" class="w-16 h-16 object-cover mr-4 rounded" />
+                        <img :src="prod.image_products?.[0]?.image_path || 'default-image.jpg'" 
+                            alt="Product Image" 
+                            class="w-16 h-16 object-cover mr-4 rounded" />
                         <div>
                             <span class="font-bold">{{ prod.name }}</span> : ${{ prod.price }} (Stock: {{ prod.stock }})
                         </div>
                     </div>
 
                     <div class="flex gap-6">
-                        <button @click="deleteProduct(prod.id)" class="bg-red-500 text-white p-1 px-4 rounded">Delete</button>
+                        <button @click.stop="deleteProduct(prod.id)" class="bg-red-400 hover:bg-red-600 text-white p-1 px-4 rounded">
+                            Delete
+                        </button>
                     </div>
                 </li>
             </ul>
@@ -240,28 +282,37 @@
             </div>
         </div>
         
-        <div v-if="selectedProduct" class="w-1/2.5 p-6 mt-12 border border-gray-300 rounded shadow-md">
-            <h2 class="text-xl font-bold mb-4">Edit Product</h2>
+        <div v-if="selectedProduct" class="w-1/2 p-6 mt-12 border border-gray-300 rounded shadow-md">
+            <div class="flex justify-between">
+                <h2 class="text-xl font-bold mb-4">Edit Product</h2>
+            
+                <button @click="openStockModal(selectedProduct)" 
+                        class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded">
+                    Edit Stock
+                </button>    
+            </div>
             
             <div class="p-4 space-y-2">
                 <!-- PICTURE -->
                 <p class="font-bold">Picture :</p>
-                <div class="flex justify-between items-center gap-10">
-                    <div class="relative border border-black border-1 rounded-md p-2 pt-3 w-    ">
+                    <div v-if="selectedProduct.image_products?.length > 0" class="mt-4">
+                        <p class="mb-2">Preview Images:</p>
+                        <div class="flex gap-4 mb-3">
+                            <div v-for="(pic, index) in selectedProduct.image_products" :key="index" class="w-24 h-24 border border-[rgba(0,0,0,0.1)] shadow-xl rounded-md">
+                                <img :src="pic.image_path" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="flex items-center gap-5">
+                    <div class="relative border border-black border-1 rounded-md p-3 pt-4">
                         <input type="file" multiple @change="handleImageUpload" id="image-upload"/>
                         <label for="image-upload" class="py-2 px-5 bg-blue-400 hover:bg-blue-700 text-white text-sm rounded-lg text-lg ">
                             Choose Image(s)
                         </label>    
                     </div>
 
-                    <!-- <div v-if="selectedFiles.length > 0" class="mt-4">
-                        <p class="mb-2">Preview Images:</p>
-                        <div class="flex gap-10">
-                            <div v-for="(file, index) in selectedFiles" :key="index" class="w-24 h-24">
-                                <img :src="file" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
-                            </div>
-                        </div>
-                    </div> -->
+
 
                     <button @click="uploadImage" class="bg-blue-400 hover:bg-blue-700 text-white p-3 rounded w-fit">Save Image</button>
                 </div>
@@ -319,35 +370,72 @@
             <button @click="updateProduct" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-4">Save Changes</button>
         </div>
 
-        <Report 
+
+        <div v-if="showStockModal">
+            <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white p-6 rounded shadow-md w-96">
+                    <h2 class="text-lg font-bold mb-4">Update Stock</h2>
+                    
+                    <label class="block mb-2 font-semibold">Amount quantity to add:</label>
+                    <input type="number" v-model="stockInput" min="0"
+                        class="border p-2 rounded w-full" />
+
+                    <div class="flex justify-end mt-4 space-x-2">
+                        <button @click="showStockModal = false"
+                                class="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                            Cancel
+                        </button>
+
+                        <button @click="addStock"
+                                class="bg-blue-400 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ReportSuccess 
             :show="showSuccessUploadImage" 
-            title="Upload Completed" 
+            title="Upload Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessUploadImage = false" 
         />
-        <Report 
+        <ReportSuccess 
             :show="showSuccessCreateCategory" 
-            title="Create Category Completed" 
+            title="Create Category Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessCreateCategory = false" 
         />
-        <Report 
+        <ReportSuccess 
             :show="showSuccessCreateBrand" 
-            title="Create Brand Completed" 
+            title="Create Brand Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessCreateBrand = false" 
         />
-        <Report 
+        <ReportSuccess 
             :show="showSuccessUpdateProduct" 
-            title="Update Product Completed" 
+            title="Update Product Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessUpdateProduct = false" 
         />
-        <Report 
+        <ReportSuccess 
             :show="showSuccessDeleteProduct" 
-            title="Delete Product Completed" 
+            title="Delete Product Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessDeleteProduct = false" 
+        />
+        <ReportSuccess 
+            :show="showSuccessAddStock" 
+            title="Add Stock Completed!!!" 
+            buttonText="Got it!" 
+            @close="showSuccessAddStock = false" 
+        />
+        <ReportFailed
+            :show="showFailAddStockQuantity" 
+            title="Add Stock Failed!!!" 
+            buttonText="OK" 
+            @close="showFailAddStockQuantity = false" 
         />
     </div>
 </template>

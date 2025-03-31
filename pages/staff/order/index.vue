@@ -151,7 +151,7 @@ onMounted(fetchOrders);
         <div v-if="isConfirmModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div class="bg-white p-6 rounded shadow-lg w-96">
                 <h2 class="text-xl font-bold mb-4">Confirm Status Change</h2>
-                <p>Are you sure you want to update Order <strong>#{{ selectedOrder?.order_id }}</strong> <br>to <strong>{{ selectedStatus }}</strong>?</p>
+                <p>Are you sure you want to update Order?<strong>#{{ selectedOrder?.order_id }}</strong> <br>to <strong>{{ selectedStatus }}</strong>?</p>
                 
                 <div class="flex justify-end mt-4 gap-2">
                     <button @click="isConfirmModalOpen = false" class="px-4 py-2 bg-gray-300 hover:bg-gray-600 hover:text-white rounded">Cancel</button>

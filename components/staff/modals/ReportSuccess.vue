@@ -30,7 +30,7 @@
             <p class="text-gray-700">{{ subtitle }}</p>
             <button 
                 @click="closeModal" 
-                class="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                class="mt-4 px-6 py-2 bg-blue-400 text-white rounded hover:bg-blue-700">
                 {{ buttonText }}
             </button>
         </div>

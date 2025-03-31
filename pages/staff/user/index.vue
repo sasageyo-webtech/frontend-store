@@ -19,7 +19,7 @@
     const loading = ref(false);
     const errorMessage = ref('');
     const showAddress = ref(false);
-    const address = ref(null);
+    const addresses = ref([]);
 
     const API_BASE = 'http://localhost/api/users';
     const API_ADDRESS = 'http://localhost/api/address-customers';
@@ -32,11 +32,11 @@
                 params: {page, limit: itemsPerPage}
             });
 
-            if (response.data.data) {
+            if (response.data) {
                 customers.value = response.data.data;
-                console.log("customer : ", response.data.data)
-                console.log("Total : ", response.data.total)
-                totalPages.value = Math.ceil(response.data.total / itemsPerPage);
+                // console.log("customer : ", response.data.data)
+                // console.log("Total : ", response.data.total)
+                totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
             } else {
                 errorMessage.value = 'Failed to fetch customers: Invalid data format.';
             }
@@ -62,14 +62,11 @@
     const fetchAddress = async (customerId) => {
         try {
             const response = await axios.get(`${API_ADDRESS}?customer_id=${customerId}`);
-            if (response.data) {
-                address.value = response.data.data[0];
-            } else {
-                address.value = null;
-            }
+            addresses.value = response.data.data || [];
+            console.log("Address : ", response.data.data)
         } catch (error) {
-            address.value = null;
-            console.error('Error fetching address:', error);
+            addresses.value = [];
+            console.error('Error fetching addresses:', error);
         }
     };
 
@@ -130,36 +127,42 @@
                     <button @click="goToCustomerOrders" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-900">Orders</button>
                 </div>
             </div>
+
             <div class="p-4 space-y-3">
                 <!-- <div v-if="selectedcustomer.image_path">
                     <p class="font-bold">Profile Picture:</p>
                     <img :src="selectedcustomer.image_path" alt="customer Image" class="w-24 h-24 object-cover rounded-md" />
                 </div> -->
-                <p><strong>Customername:</strong> {{ selectedCustomer.username }}</p>
-                <p><strong>Email:</strong> {{ selectedCustomer.email }}</p>
-                <p><strong>First Name:</strong> {{ selectedCustomer.firstname }}</p>
-                <p><strong>Last Name:</strong> {{ selectedCustomer.lastname }}</p>
-                <p><strong>Gender:</strong> {{ selectedCustomer.gender }}</p>
+                <p><strong>Customername:</strong> {{ selectedCustomer.username || '-'}}</p>
+                <p><strong>Email:</strong> {{ selectedCustomer.email || '-'}}</p>
+                <p><strong>First Name:</strong> {{ selectedCustomer.firstname || '-'}}</p>
+                <p><strong>Last Name:</strong> {{ selectedCustomer.lastname || '-'}}</p>
+                <p><strong>Gender:</strong> {{ selectedCustomer.gender || '-'}}</p>
                 <p><strong>Citizen Code:</strong> {{ selectedCustomer.citizen_code || 'N/A' }}</p>
                 <p><strong>Birthdate:</strong> {{ selectedCustomer.birthdate || 'N/A' }}</p>
                 <p><strong>Phone Number:</strong> {{ selectedCustomer.phone_number || 'N/A' }}</p>
-                <p><strong>Role:</strong> {{ selectedCustomer.role }}</p>
+                <p><strong>Role:</strong> {{ selectedCustomer.role || '-'}}</p>
                 <p><strong>Email Verified:</strong> {{ selectedCustomer.email_verified_at ? 'Yes' : 'No' }}</p>
             </div>
-            
-            <div v-if="showAddress && address" class="p-4 space-y-3 border-t border-gray-300 mt-4">
-                <h3 class="font-bold text-lg">Address Information</h3>
-                <p><strong>Phone Number:</strong> {{ address.phone_number }}</p>
-                <p><strong>House Number:</strong> {{ address.house_number }}</p>
-                <p><strong>Building:</strong> {{ address.building }}</p>
-                <p><strong>Street:</strong> {{ address.street }}</p>
-                <p><strong>Sub District:</strong> {{ address.sub_district }}</p>
-                <p><strong>District:</strong> {{ address.district }}</p>
-                <p><strong>Province:</strong> {{ address.province }}</p>
-                <p><strong>Country:</strong> {{ address.country }}</p>
-                <p><strong>Postal Code:</strong> {{ address.postal_code }}</p>
-                <p><strong>Detail Address:</strong> {{ address.detail_address }}</p>
+
+            <div v-if="showAddress && addresses.length > 0" class="p-4 space-y-3 border-t border-gray-300 mt-4">
+                <h3 class="font-bold text-lg">Addresses</h3>
+                <div v-for="(addr, index) in addresses" :key="index" class="border p-3 rounded-md bg-gray-100 my-2">
+                    <h4 class="font-bold text-md">Address {{ index + 1 }}</h4>
+                    <p><strong>Name:</strong> {{ addr.name || '-'}}</p>
+                    <p><strong>Phone Number:</strong> {{ addr.phone_number || '-'}}</p>
+                    <p><strong>House Number:</strong> {{ addr.house_number || '-'}}</p>
+                    <p><strong>Building:</strong> {{ addr.building || '-'}}</p>
+                    <p><strong>Street:</strong> {{ addr.street || '-'}}</p>
+                    <p><strong>Sub District:</strong> {{ addr.sub_district || '-'}}</p>
+                    <p><strong>District:</strong> {{ addr.district || '-'}}</p>
+                    <p><strong>Province:</strong> {{ addr.province || '-'}}</p>
+                    <p><strong>Country:</strong> {{ addr.country || '-'}}</p>
+                    <p><strong>Postal Code:</strong> {{ addr.postal_code || '-'}}</p>
+                    <p><strong>Detail Address:</strong> {{ addr.detail_address || '-'}}</p>
+                </div>
             </div>
+
         </div>
     </div>
 </template>
