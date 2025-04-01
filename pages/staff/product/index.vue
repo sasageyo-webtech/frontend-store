@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref, computed, onMounted } from 'vue';
     import axios from 'axios';
     import ReportSuccess from '@/components/staff/modals/ReportSuccess.vue';
     import ReportFailed from '@/components/staff/modals/ReportFailed.vue';
@@ -8,7 +8,10 @@
         layout: 'staff',
     });
 
+    const searchQuery = ref('');
+
     const showSuccessUploadImage = ref(false);
+    const showSuccessDeleteImage = ref(false);
     const showSuccessCreateCategory = ref(false);
     const showSuccessCreateBrand = ref(false);
     const showSuccessUpdateProduct = ref(false);
@@ -36,6 +39,8 @@
 
     const loading = ref(false)
     const errorMessage = ref('')
+    const categoryErrorMessage = ref('');
+    const brandErrorMessage = ref('');
 
     const API_BASE = 'http://localhost/api/products'
     const CATEGORY_API_BASE = 'http://localhost/api/categories'
@@ -48,11 +53,15 @@
 
         try {
             const response = await axios.get(API_BASE, {
-                params: { page, limit: itemsPerPage }
+                params: {
+                    page,
+                    limit: itemsPerPage,
+                    search: searchQuery.value,
+                }
             });
 
             if (response.data) {
-                products.value = response.data.data
+                products.value = response.data.data;
                 totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
             } else {
                 errorMessage.value = 'Invalid data format.';
@@ -65,6 +74,13 @@
             loading.value = false;
         }
     };
+
+    const filteredProducts = computed(() => {
+        return products.value.filter((product) => {
+            const matchesName = product.name.toLowerCase().startsWith(searchQuery.value.toLowerCase());
+            return matchesName;
+        });
+    });
 
     const changePage = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages.value) {
@@ -94,47 +110,85 @@
         }
     }
 
-    const createCategory = async () => {
+    const createCategory = async () => { 
         if (!newCategory.value.trim()) {
-            errorMessage.value = 'Please enter a category name.'
-            return
+            categoryErrorMessage.value = 'Please enter a category name.';
+            return;
+        }
+
+        if (categories.value.some(category => category.name.toLowerCase() === newCategory.value.trim().toLowerCase())) {
+            categoryErrorMessage.value = 'Category name already exists.';
+            return;
         }
 
         try {
-            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value })
-            if (response.status === 201) {
+            const response = await axios.post(CATEGORY_API_BASE, { name: newCategory.value });
+
+            if (response.status === 201 || response.status === 200) {
                 showSuccessCreateCategory.value = true;
-                categories.value.push(response.data)
-                newCategory.value = ''
+                categories.value.push(response.data.category);
+                newCategory.value = '';
+                categoryErrorMessage.value = '';
+            } else {
+                categoryErrorMessage.value = response.data.message || 'Unexpected response.';
             }
         } catch (error) {
-            console.error('Create Category Error:', error.message)
-            errorMessage.value = 'Failed to create category.'
+            if (error.response) {
+                if (error.response.status === 422) {
+                    categoryErrorMessage.value = 'Validation failed: Category name might already exist.';
+                } else {
+                    categoryErrorMessage.value = error.response.data.message || 'Failed to create category.';
+                }
+            } else {
+                categoryErrorMessage.value = 'Network error or server is down.';
+            }
+            console.error('Create Category Error:', error);
         }
-    }
+    };
 
     const createBrand = async () => {
         if (!newBrand.value.trim()) {
-            errorMessage.value = 'Please enter a Brand name.'
-            return
+            brandErrorMessage.value = 'Please enter a brand name.';
+            return;
+        }
+
+        if (brands.value.some(brand => brand.name.toLowerCase() === newBrand.value.trim().toLowerCase())) {
+            brandErrorMessage.value = 'Brand name already exists.';
+            return;
         }
 
         try {
-            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value })
-            if (response.status === 201) { 
-                showSuccessCreateBrand.value = true;   
-                brands.value.push(response.data)
-                newBrand.value = ''
+            const response = await axios.post(BRAND_API_BASE, { name: newBrand.value });
+
+            if (response.status === 201 || response.status === 200) { 
+                showSuccessCreateBrand.value = true;
+                brands.value.push(response.data.brand);
+                newBrand.value = '';
+                brandErrorMessage.value = ''; 
             }
         } catch (error) {
-            console.error('Create Brand Error:', error.message)
-            errorMessage.value = 'Failed to create Brand.'
+            if (error.response) {
+                if (error.response.status === 422) {
+                    brandErrorMessage.value = 'Validation failed: Brand name might already exist.';
+                } else if (error.response.status === 404) {
+                    brandErrorMessage.value = 'Brand not found.';
+                } else {
+                    brandErrorMessage.value = error.response.data.message || 'An error occurred.';
+                }
+            } else {
+                brandErrorMessage.value = 'Network error. Please try again later.';
+            }
         }
-    }
+    };
 
     const uploadImage = async () => {
+        if (!selectedProduct.value || selectedFiles.value.length === 0) {
+            errorMessage.value = 'Please select a product and an image.';
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('product_id', selectedProduct.value.id)
+        formData.append('product_id', selectedProduct.value.id);
         formData.append('image_file', selectedFiles.value[0]);
 
         try {
@@ -144,11 +198,34 @@
 
             if (response.status === 200) {
                 showSuccessUploadImage.value = true;
+                fetchProducts(); // Refresh product list with new image
             }
         } catch (error) {
-            console.error('Image Upload Error:', error.message);
+            if (error.response && error.response.status === 422) {
+                errorMessage.value = 'Validation failed: Ensure the file is a valid image.';
+            } else {
+                errorMessage.value = 'Image upload failed. Try again.';
+            }
         }
     };
+
+    const deleteImage = async (imageId) => {
+        try {
+            const response = await axios.delete(`http://localhost/api/products/images/${imageId}`);
+
+            if (response.status === 200) {
+                showSuccessDeleteImage.value = true;
+                selectedProduct.value.image_products = selectedProduct.value.image_products.filter(img => img.id !== imageId);
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                errorMessage.value = 'Image not found or already deleted.';
+            } else {
+                errorMessage.value = error.message;
+            }
+        }
+    };
+
 
     // const handleImageUpload = (event) => {
     //     selectedFiles.value = Array.from(event.target.files).map(file => {
@@ -168,6 +245,20 @@
     const updateProduct = async () => {
         if (!selectedProduct.value) return;
 
+        const duplicate = products.value.find(
+            (prod) => prod.name.trim().toLowerCase() === selectedProduct.value.name.trim().toLowerCase() && prod.id !== selectedProduct.value.id
+        );
+
+        if (duplicate) {
+            errorMessage.value = 'Product name already exists. Please choose a different name.';
+            return;
+        }
+
+        if (selectedProduct.value.price < 0) {
+            errorMessage.value = "Price cannot be negative.";
+            return;
+        }
+
         try {
             const response = await axios.put(`${API_BASE}/${selectedProduct.value.id}`, selectedProduct.value);
 
@@ -184,8 +275,8 @@
         }
     };
 
+
     const deleteProduct = async (id) => {
-        // console.log("Response delete: ", id)
         try {
             const response = await axios.delete(`${API_BASE}/${id}`);
             if (response.status === 200) {
@@ -222,7 +313,7 @@
         } catch (error) {
             console.error('Stock Update Error:', error.message);
             alert('Failed to update stock.');
-        }
+        }   
     };
 
     const openStockModal = (product) => {
@@ -230,6 +321,10 @@
         stockInput.value = 0;
         showStockModal.value = true;
     };
+    
+    watch([searchQuery], () => {
+        fetchProducts();
+    });
 
     onMounted(() => {
         fetchProducts()
@@ -245,9 +340,15 @@
 
             <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
+            <!-- Search Filter -->
+            <div class="mb-4">
+                <input v-model="searchQuery" type="text" placeholder="Search by product name..." 
+                class="border p-2 rounded w-full mb-2" />
+            </div>
+
             <div v-if="loading" class="text-gray-500">Loading products...</div>
             <ul v-else> 
-                <li :key="index" v-for="(prod, index) in products" 
+                <li :key="index" v-for="(prod, index) in filteredProducts" 
                     @click="selectProduct(prod)" 
                     class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-[rgba(0,0,0,0.1)] shadow-xl rounded">
                     
@@ -295,14 +396,17 @@
             <div class="p-4 space-y-2">
                 <!-- PICTURE -->
                 <p class="font-bold">Picture :</p>
-                    <div v-if="selectedProduct.image_products?.length > 0" class="mt-4">
-                        <p class="mb-2">Preview Images:</p>
-                        <div class="flex gap-4 mb-3">
-                            <div v-for="(pic, index) in selectedProduct.image_products" :key="index" class="w-24 h-24 border border-[rgba(0,0,0,0.1)] shadow-xl rounded-md">
-                                <img :src="pic.image_path" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
-                            </div>
+                <div v-if="selectedProduct.image_products?.length > 0" class="mt-4">
+                    <p class="mb-2">Preview Images:</p>
+                    <div class="flex gap-4 mb-3">
+                        <div v-for="(pic, index) in selectedProduct.image_products" :key="index" class="relative w-24 h-24 border shadow-xl rounded-md">
+                            <img :src="pic.image_path" alt="Selected Image Preview" class="w-full h-full object-cover rounded-md" />
+                            <button @click="deleteImage(pic.image_id)" class="absolute top-0 right-0 bg-red-500 text-white px-2 text-sm rounded">
+                                X
+                            </button>
                         </div>
                     </div>
+                </div>
 
                 <div class="flex items-center gap-5">
                     <div class="relative border border-black border-1 rounded-md p-3 pt-4">
@@ -323,40 +427,63 @@
                 
                 <!-- DESCRIPTION -->
                 <p class="font-bold">Description :</p>
-                <textarea v-model="selectedProduct.description" class="border p-2 rounded w-full"></textarea>
+                <textarea 
+                    v-model="selectedProduct.description" 
+                    class="border p-2 rounded w-full" 
+                    :rows="selectedProduct.description.length > 0 ? Math.min(selectedProduct.description.split('\n').length + 3, 10) : 3"
+                    placeholder="Enter description here...">
+                </textarea>
                 
                 <!-- PRICE -->
                 <p class="font-bold">Price :</p>
                 <input v-model="selectedProduct.price" type="number" class="border p-2 rounded w-full" required />
                 
                 <!-- CATEGORY -->
-                <div class="flex gap-2">
-                    <p class="font-bold">Category :</p> 
-                    <p> {{ selectedProduct.category.name }}</p>
-                </div>
-                <select v-model="selectedProduct.category_id" class="border p-2 rounded w-full" required>
-                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                <div class="mb-4">
+                    <div class="mb-1">
+                        <label for="category_id" class="font-bold">Category :</label>
+                        {{ selectedProduct.category.name }}
+                    </div>
+                    <select
+                        id="category_id"
+                        v-model="selectedProduct.category_id"
+                        class="w-full p-2 border rounded"
+                        required
+                    >
+                        <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
-                    </option>
-                </select>
-                <div class="mt-2">
-                    <input v-model="newCategory" type="text" placeholder="add new category name" class="border p-2 rounded w-full" />
-                    <button @click.prevent="createCategory" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Category</button>
+                        </option>
+                    </select>
+
+                    <div class="mt-2">
+                        <input v-model="newCategory" type="text" placeholder="add new category name" class="border border-gray-300 p-2 rounded w-full" />
+                        <p v-if="categoryErrorMessage" class="text-red-500 text-sm mt-1">{{ categoryErrorMessage }}</p>
+                        <button @click.prevent="createCategory" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Category</button>
+                    </div>
                 </div>
 
                 <!-- BRAND -->
-                <div class="flex gap-2">
-                    <p class="font-bold">Brand :</p>
-                    <p> {{ selectedProduct.brand.name }}</p>
-                </div>
-                <select v-model="selectedProduct.brand_id" placeholder="brand" class="border p-2 rounded w-full" required>
-                    <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+                <div class="mb-4">
+                    <div class="mb-1">
+                        <label for="brand_id" class="font-bold">Brand :</label>
+                        {{ selectedProduct.brand.name }}
+                    </div>
+                    <select
+                        id="brand_id"
+                        v-model="selectedProduct.brand_id"
+                        class="w-full p-2 border rounded"
+                        required
+                    >
+                        <option v-for="brand in brands" :key="brand.id" :value="brand.id">
                         {{ brand.name }}
-                    </option>   
-                </select>
-                <div class="mt-2">
-                    <input v-model="newBrand" type="text" placeholder="add new brand name" class="border p-2 rounded w-full" />
-                    <button @click.prevent="createBrand" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Brand</button>
+                        </option>
+                    </select>
+
+                    <div class="mt-2">
+                        <input v-model="newBrand" type="text" placeholder="add new brand name" class="border border-gray-300 p-2 rounded w-full" />
+                        <p v-if="brandErrorMessage" class="text-red-500 text-sm mt-1">{{ brandErrorMessage }}</p>
+                        <button @click.prevent="createBrand" class="bg-blue-400 hover:bg-blue-700 text-white p-2 rounded w-full mt-2">Create New Brand</button>
+                    </div>
                 </div>
 
                 <!-- ACCESSIBILITY -->
@@ -397,9 +524,15 @@
 
         <ReportSuccess 
             :show="showSuccessUploadImage" 
-            title="Upload Completed!!!" 
+            title="Upload Image Completed!!!" 
             buttonText="Got it!" 
             @close="showSuccessUploadImage = false" 
+        />
+        <ReportSuccess 
+            :show="showSuccessDeleteImage" 
+            title="Delete Image Completed!!!" 
+            buttonText="Got it!" 
+            @close="showSuccessDeleteImage = false" 
         />
         <ReportSuccess 
             :show="showSuccessCreateCategory" 

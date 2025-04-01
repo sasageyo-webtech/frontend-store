@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import axios from 'axios';
 
@@ -15,6 +15,7 @@
 
     const customers = ref([]);
     const selectedCustomer = ref(null);
+    const searchQuery = ref(''); 
 
     const loading = ref(false);
     const errorMessage = ref('');
@@ -29,13 +30,11 @@
         errorMessage.value = '';
         try {
             const response = await axios.get(API_BASE, {
-                params: {page, limit: itemsPerPage}
+                params: { page, limit: itemsPerPage }
             });
 
             if (response.data) {
                 customers.value = response.data.data;
-                // console.log("customer : ", response.data.data)
-                // console.log("Total : ", response.data.total)
                 totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
             } else {
                 errorMessage.value = 'Failed to fetch customers: Invalid data format.';
@@ -46,7 +45,16 @@
             loading.value = false;
         }
     };
-    
+
+    const filteredCustomers = computed(() => {
+        if (!searchQuery.value) return customers.value;
+        return customers.value.filter(customer =>
+            (`${customer.firstname} ${customer.lastname}`)
+                .toLowerCase()
+                .startsWith(searchQuery.value.toLowerCase())
+        );
+    });
+
     const changePage = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages.value) {
             currentPage.value = newPage;
@@ -63,7 +71,6 @@
         try {
             const response = await axios.get(`${API_ADDRESS}?customer_id=${customerId}`);
             addresses.value = response.data.data || [];
-            console.log("Address : ", response.data.data)
         } catch (error) {
             addresses.value = [];
             console.error('Error fetching addresses:', error);
@@ -88,16 +95,24 @@
     });
 </script>
 
+
 <template>
     <div class="mt-10 mx-16 flex gap-10">
         <div class="w-1/2">
             <h1 class="text-2xl font-bold mb-4">Customer List</h1>
+
+            <!-- Search Input -->
+            <input v-model="searchQuery" type="text" placeholder="Search by name..."
+                class="w-full px-3 py-2 mb-4 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+
             <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
             <div v-if="loading" class="text-gray-500">Loading customers...</div>
+            
             <ul v-else>
-                <li v-for="customer in customers" :key="customer.customer_id" @click="selectCustomer(customer)" class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-gray-300 shadow-xl rounded cursor-pointer">
+                <li v-for="customer in filteredCustomers" :key="customer.customer_id"
+                    @click="selectCustomer(customer)"
+                    class="flex justify-between hover:bg-gray-200 items-center my-2 p-2 px-3 border border-gray-300 shadow-xl rounded cursor-pointer">
                     <div class="flex items-center">
-                        <!-- <img :src="customer.image_path" alt="customer Image" class="w-12 h-12 object-cover mr-4 rounded-full" /> -->
                         <div>
                             <span class="font-bold">{{ customer.firstname }} {{ customer.lastname }}</span> - {{ customer.email }}
                         </div>
