@@ -8,14 +8,10 @@ const brands = ref([]);
 const carts = ref([])
 
 
-
-
-
 const logoutUser = async () => {
     try {
-        const response = await apiClient.post('/user/revoke', {}, { headers: {
-                    // Authorization: `Bearer ${localStorage.getItem('authToken')}`
-                }
+        const response = await apiClient.post('/users/revoke', {
+          
         });
     } catch (error) {
         console.error('Logout failed:', error);
@@ -47,6 +43,7 @@ onMounted(async () => {
 
     const brandsResponse = await apiClient.get('/brands');
     brands.value = brandsResponse.data.data;
+
   } catch (error) {
     console.error('Failed to fetch categories and brands:', error);
   }
