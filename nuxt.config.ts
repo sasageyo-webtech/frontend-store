@@ -6,12 +6,14 @@ export default defineNuxtConfig({
   modules: [
     '@vueuse/nuxt',
     "@nuxtjs/tailwindcss",
-    '@pinia/nuxt'
+    '@pinia/nuxt',
   ],
 
   pinia: {
     storesDirs: ['./stores/**', './custom-folder/stores/**'],
   },
+
+
 
   css: ['~/assets/css/main.css'],
 
@@ -33,8 +35,9 @@ export default defineNuxtConfig({
     }
   },
   plugins: [
-    '~/plugins/pinia.ts' // ลงทะเบียน plugin
-  ]
+    '~/plugins/pinia.ts', // ลงทะเบียน plugin
+    '~/plugins/sweetalert2.ts'
+  ],
 
   
 })

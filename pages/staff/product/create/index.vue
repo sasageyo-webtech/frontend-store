@@ -3,6 +3,7 @@
     import axios from 'axios';
     import ReportSuccess from '@/components/staff/modals/ReportSuccess.vue';
     import ReportFailed from '@/components/staff/modals/ReportFailed.vue';
+    
 
     definePageMeta({ layout: 'staff' });
 
@@ -335,7 +336,6 @@
                 </div>
             </form>
         </div>
-    </div>
 
         <ReportSuccess 
             :show="showSuccessCreateProduct" 
@@ -355,6 +355,7 @@
             buttonText="Got it!" 
             @close="showSuccessCreateBrand = false" 
         />
+    </div>
 </template>
 
 <style lang="scss" scoped>

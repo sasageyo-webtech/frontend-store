@@ -2,6 +2,8 @@
 import { UserRole } from '~/types/users'
 import { useUser } from '~/stores/useUser'
 
+definePageMeta({layout: 'auth',})
+
 const router = useRouter()
 const userStore = useUser()
 const email = ref('')
@@ -50,7 +52,7 @@ const loginUser = async () => {
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-orange-100">
+    <div class="flex items-center justify-center min-h-[730px] bg-orange-100">
         <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-2xl">
             <h2 class="text-2xl font-semibold text-center text-gray-700">Login</h2>
             
