@@ -39,5 +39,12 @@ export default defineNuxtConfig({
     '~/plugins/sweetalert2.ts'
   ],
 
+  imports: {
+    dirs: [
+      'types',
+      'plugins'
+    ]
+  }
+
   
 })

@@ -80,7 +80,17 @@ const register = async () => {
         <label class="block font-medium">Confirm Password</label>
         <input v-model="form.password_confirmation" type="password" class="w-full p-2 border rounded" />
       </div>
-      <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full">Register</button>
+      <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-800 duration-300 text-xl">Register</button>
     </form>
+    <div class="text-center mt-6">
+        <p>
+            if you have account already
+            <NuxtLink to="/auth/login">
+                <span class="text-blue-500 text-xl font-bold ml-2 underline hover:text-blue-800 duration-300">
+                    Login   
+                </span>
+            </NuxtLink>
+        </p>
+    </div>
   </div>
 </template>
