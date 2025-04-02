@@ -70,30 +70,31 @@ onMounted(async () => {
       </div>
 
       <div class="flex-none pr-4">
-      <ul class="menu menu-horizontal px-4 z-[1]">
-        <li>
-          <details>
-            <summary class="text-white">Category</summary>
-            <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
-              <li><NuxtLink to="/customer/product">All</NuxtLink></li>
-              <li v-for="category in categories" :key="category.id">
-                <NuxtLink :to="`/customer/product?category_id=${category.id}`">{{ category.name }}</NuxtLink>
-              </li>
-            </ul>
-          </details>
-        </li>
-        <li>
-          <details>
-            <summary class="text-white">Brand</summary>
-            <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
-              <li><NuxtLink to="/customer/product">All</NuxtLink></li>
-              <li v-for="brand in brands" :key="brand.id">
-                <NuxtLink :to="`/customer/product?brand_id=${brand.id}`">{{ brand.name }}</NuxtLink>
-              </li>
-            </ul>
-          </details>
-        </li>
-      </ul>
+        <ul class="menu menu-horizontal px-4 z-[1]">
+            <li>
+              <details>
+                <summary class="text-white">Category</summary>
+                <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
+                  <li><NuxtLink to="/customer/product">All</NuxtLink></li>
+                  <li v-for="category in categories" :key="category.id">
+                    <NuxtLink :to="`/customer/product?category_id=${category.id}`">{{ category.name }}</NuxtLink>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            
+            <li>
+              <details>
+                <summary class="text-white">Brand</summary>
+                <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
+                  <li><NuxtLink to="/customer/product">All</NuxtLink></li>
+                  <li v-for="brand in brands" :key="brand.id">
+                    <NuxtLink :to="`/customer/product?brand_id=${brand.id}`">{{ brand.name }}</NuxtLink>
+                  </li>
+                </ul>
+              </details>
+            </li>
+        </ul>
     </div>
       
 

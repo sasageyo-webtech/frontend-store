@@ -52,6 +52,9 @@ watchEffect(() => {
 
 </script>
 
+
+
+
 <template>
     <div class="p-10">
         <div class="flex justify-between">
@@ -85,6 +88,7 @@ watchEffect(() => {
             
                         <div class="flex place-content-between">
                             <div class=""> {{ product.price }} ฿</div>
+                            <div v-if="product" class="badge badge-outline badge-info mt-1">{{ product.category.name }}</div>
                             <!-- <div class="card-actions">
                                 <button class="btn btn-primary text-[10px] rounded-[30px] ">Add to Cart</button>
                             </div> -->
