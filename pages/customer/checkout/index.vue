@@ -1,4 +1,5 @@
 <script setup>
+const { $swal } = useNuxtApp()
 const userStore = useUser()
 const carts = ref([])
 const customer_address = ref({})
@@ -8,8 +9,27 @@ const router = useRouter()
 const errorMessage = ref()
 
 const fetchCarts = async () => {
-    const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
-    carts.value = cartsResponse.data.data
+    try {
+        const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
+        carts.value = cartsResponse.data.data
+    }catch (error){
+        if(error.response){
+            $swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: 'Please try to refresh again',
+                confirmButtonText: "Back",
+            }).then(result => {
+                if(result.isConfirmed){
+                    router.push("/customer/cart")
+                }
+            })
+        }else{
+            console.log("something wrong not about backend")
+        }
+    }
+
 }
 
 // Calculate the total price (sum of all cart items' total_price + delivery fee)

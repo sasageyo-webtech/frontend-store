@@ -1,12 +1,33 @@
 <script setup>
+const { $swal } = useNuxtApp()
 const userStore = useUser()
 const carts = ref([])
 
 const deleteCart = async (cart_id) => {
-    const response = await apiClient.delete(`/carts/${cart_id}`)
-    console.log(response.status)
-    await fetchCarts()
+    $swal.fire({
+        title: "Do you want to delete the product?",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+    }).then(async (result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                try {
+                    const response = await apiClient.delete(`/carts/${cart_id}`)
+                    $swal.fire("Delete!", "", "success");
+                    await fetchCarts()
+                }catch (error){
+                    if(error.response){
+                        $swal.fire({
+                            icon: "error",
+                            title: "Something went wrong!",
+                            text: error.response.errors.cart_id,
+                        });
+                    }
+                }
+            } 
+    });
 }
+
 const calculateTotalPrice = () => {
     const totalPrice = carts.value.reduce((sum, cart) => sum + cart.total_price, 0);
     return totalPrice;
@@ -15,8 +36,6 @@ const calculateTotalPrice = () => {
 const fetchCarts = async () => {
     const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
     carts.value = cartsResponse.data.data
-
-    console.log(carts.value)
 }
 
 onMounted( async ()=>{
@@ -33,9 +52,6 @@ watchEffect(() => {
 
 <template>
     <div>
-        <!-- <pre>
-            {{  carts }}
-        </pre>  -->
         <div class="grid gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg m-20">
             <div>
                 <div class="overflow-x-auto">
