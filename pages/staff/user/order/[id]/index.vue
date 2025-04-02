@@ -22,9 +22,7 @@
         errorMessage.value = "";
 
         try {
-            const response = await axios.get(API_ORDERS, {
-                params: { customer_id: customerId.value },
-            });
+            const response = await axios.get(`${API_BASE}/${customerId}`);
 
             if (response.data.data) {
                 orders.value = response.data.data;
