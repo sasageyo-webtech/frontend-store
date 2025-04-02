@@ -2,11 +2,12 @@
 const userStore = useUser()
 const product = ref(null)
 const quantity = ref(1)
-const reviewers = ref(0)
+const products = ref([])
 const productImages = ref([]);
 const reviews = ref([])
 const {product_id} = useRoute().params
 const router = useRouter()
+const user = ref()
 
 const increaseQuantity = () => {
     if (quantity.value < product.value.stock) {
@@ -45,6 +46,21 @@ const fetchReview = async () => {
     
 }
 
+const fetchProductsRecommend = async () => {
+    console.log(product.value.category.id)
+    try {
+    const response = await apiClient.get(`/products/categories/${product.value.category.id}`);
+    products.value = response.data.data.slice(0, 8);
+
+    console.log(products)
+  
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+    
+  ;}
+
+
 const addToCart = async () => {
     console.log(userStore.userInfo.customer_id, product.value.id, quantity.value);
     try {
@@ -68,18 +84,23 @@ const addToCart = async () => {
 
 onMounted(async () => {
     await userStore.loadUser()
+    user.value = userStore.userInfo
     await fetchProduct()
+    await fetchReview()
+    await fetchProductsRecommend()
 })
 
-onMounted(fetchReview)
 
-watchEffect(() => {
-    fetchProduct()
-    // fetchReview()
-})
+// watchEffect(() => {
+//     fetchProducts()
+//     // fetchReview()
+// })
 
 
 </script>
+
+
+
 
 <template>
     <div>
@@ -88,13 +109,17 @@ watchEffect(() => {
             <span>Back</span>
         </NuxtLink>
         <div class="grid grid-cols-[auto_1fr] gap-4 card card-compact bg-base-100 shadow-xl p-4 rounded-lg m-20">
-            <!-- image -->
+<!--    image        -->
             <div>
                 <Imageslidexs v-if="productImages" :images="productImages" />
             </div>
-            <!-- content -->
+<!--    content      -->
             <div class="relative">
-                <p v-if="product" class="card-title text-lg font-bold">{{ product.name }}</p>
+                <div class="flex gap-4">
+                    <p v-if="product" class="card-title text-lg font-bold">{{ product.name }}</p>   
+                    <div v-if="product" class="badge badge-outline badge-info mt-1">{{ product.category.name }}</div>
+                </div>
+                
                 <p v-if="product" class="text-base text-blue-800">{{ product.brand.name }}</p>
                 <div class="flex py-5">
                       <div>
@@ -111,7 +136,8 @@ watchEffect(() => {
     
                 <div><strong v-if="product">{{ product.price }} ฿ </strong></div>
 
-                <div class="flex place-content-between items-center mt-4 absolute inset-x-0 bottom-0 h-16 ">
+                <div v-if="userStore.isLoggedIn" class="flex place-content-between items-center mt-4 absolute inset-x-0 bottom-0 h-16 ">
+
                     <div class="grid grid-cols-3 gap-3 bg-gray-100 rounded-3xl py-2 px-10">
                         Quantity
                         <div class="flex gap-5">
@@ -126,11 +152,11 @@ watchEffect(() => {
                         
                     </div>
                     <div class="card-actions"> 
-                        <svgHeart></svgHeart>
-                    
+
                         <button @click="addToCart()" class="btn btn-primary text-[10px] rounded-[30px]">Add to Cart</button>
-                        <!-- <button class="btn btn-accent text-[10px] rounded-[30px]">Buy Now</button> -->
+                      
                     </div>
+
                 </div>
 
                 
@@ -139,8 +165,8 @@ watchEffect(() => {
         </div>
     
     
-    <!-- reviews -->
-    
+<!--    reviews   -->
+        
         <h1 class="mx-20 mb-10">Product Reviews</h1>
         <div class="mb-20">
             <ProductReviews
@@ -153,7 +179,43 @@ watchEffect(() => {
             />
         </div> 
     
- 
+    
+<!--   Recommend Products   -->
+
+    <h1 class="mx-20 mb-10">You may also like this</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-20"> 
+            <div 
+            
+                class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg hover:bg-gray-200 duration-300" 
+                v-for="(product, index) in products" 
+                :key="index">
+
+                <NuxtLink :to="`/customer/product/${product.id}`"> 
+
+                    <figure class="flex justify-center p-4">
+                        <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />
+                    </figure>
+
+                    <div class="card-body">
+                        
+                        <p class="card-title text-lg font-bold">{{ product.name }}</p>
+                        <p class="text-base text-blue-800"> {{ product.brand.name }}</p>
+            
+                        <div class="flex place-content-between">
+                            <div class=""> {{ product.price }} ฿</div>
+                            <div v-if="product" class="badge badge-outline badge-info mt-1">{{ product.category.name }}</div>
+                        </div>
+
+                    </div>
+
+                </NuxtLink>
+            </div>
+
+        
+    </div>
+  
+
+
         
     </div>
     
