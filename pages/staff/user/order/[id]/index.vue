@@ -6,7 +6,7 @@
     definePageMeta({ layout: "staff" });
 
     const route = useRoute();
-    const customerId = ref(route.params.id);
+    const customerId = ref(route.params);
     const username = ref(route.query.username || "-");
 
     const orders = ref([]);
@@ -26,7 +26,9 @@
         errorMessage.value = "";
 
         try {
-            const response = await axios.get(`${API_ORDERS}/${customerId}`);
+            console.log("Param : ", route.params)
+            console.log("ID : ", customerId.value.id)
+            const response = await axios.get(`${API_ORDERS}/${customerId.value.id}`);
 
             if (response.data.data) {
                 orders.value = response.data.data;
