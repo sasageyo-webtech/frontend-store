@@ -2,7 +2,10 @@
 const userStore = useUser()
 const product = ref(null)
 const quantity = ref(1)
+const reviewers = ref(0)
 const productImages = ref([]);
+const reviews = ref([])
+const {product_id} = useRoute().params
 const router = useRouter()
 
 const increaseQuantity = () => {
@@ -18,25 +21,28 @@ const decreaseQuantity = () => {
 };
 
 const fetchProduct = async () => {
-        const {product_id} = useRoute().params
         try {
             const response = await apiClient.get(`/products/${product_id}`);
             product.value = response.data.data
-        // ตรวจสอบข้อมูลที่ได้    
-        console.log('Product:', product.value);
-        console.log('Product Name:', product.value.name);
-        console.log('Product Brand:', product.value.brand?.name);
-        console.log('Product Images:', product.value.image_products)
 
         // ดึงเฉพาะรูปภาพของสินค้า
         productImages.value = product.value.image_products.map(img => img.image_path)
 
-        console.log(productImages)
-
-
         } catch (error) {
             console.error('Error fetching products:', error);
         }
+}
+
+const fetchReview = async () => {
+    console.log('productID: ',product_id)
+    try {
+        const response = await apiClient.get(`/products/${product_id}/reviews`);
+        reviews.value = response.data.data
+
+    } catch (error) {
+        console.error('Error fetching reviews',error)
+    }
+    
 }
 
 const addToCart = async () => {
@@ -65,8 +71,11 @@ onMounted(async () => {
     await fetchProduct()
 })
 
+onMounted(fetchReview)
+
 watchEffect(() => {
     fetchProduct()
+    // fetchReview()
 })
 
 
@@ -82,22 +91,18 @@ watchEffect(() => {
             <!-- image -->
             <div>
                 <Imageslidexs v-if="productImages" :images="productImages" />
-                <!-- <img :src="product.thumbnail" class="w-full h-40 object-contain" /> -->
             </div>
             <!-- content -->
             <div class="relative">
                 <p v-if="product" class="card-title text-lg font-bold">{{ product.name }}</p>
                 <p v-if="product" class="text-base text-blue-800">{{ product.brand.name }}</p>
                 <div class="flex py-5">
-                      <div class="flex">
-                        <SvgStar></SvgStar>  
-                        <SvgStar></SvgStar>
-                        <SvgGrayStar></SvgGrayStar>
-                        <SvgGrayStar></SvgGrayStar>
-                        <SvgGrayStar></SvgGrayStar>
+                      <div>
+                        <ProductReviewsMain v-if="product && product.rating" :rating="product.rating" />
+
                       </div>      
                       <div class="px-5 text-xs text-gray-800">
-                        112 Reviewers
+                        {{ reviews.length }} Reviewers
                       </div>
                 </div>
          
@@ -136,13 +141,19 @@ watchEffect(() => {
     
     <!-- reviews -->
     
-        <!-- <h1 class="mx-20 mb-10">Product Reviews</h1>
+        <h1 class="mx-20 mb-10">Product Reviews</h1>
         <div class="mb-20">
-            <ProductReviews></ProductReviews>
-            <ProductReviews></ProductReviews>
-            <ProductReviews></ProductReviews>
-        </div> -->
+            <ProductReviews
+            v-for="(review, index) in reviews" 
+            :key="index"
+            :username="review.user.username"
+            :comment="review.comment" 
+            :profile="review.user.image_path"
+            :rating="review.rating"
+            />
+        </div> 
     
+ 
         
     </div>
     
@@ -161,3 +172,5 @@ watchEffect(() => {
         padding-left: 10px;
     }
     </style>
+
+

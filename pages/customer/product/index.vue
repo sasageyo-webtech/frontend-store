@@ -1,57 +1,3 @@
-<template>
-    <div class="p-10">
-        <div class="flex justify-between">
-            <strong class="text-xl font-semibold align-baseline">All Products</strong>
-            <input 
-                v-model="searchQuery" 
-                @input="searchProducts"
-                placeholder="Search products..." 
-                class="input input-bordered w-60"
-            />
-        </div>
-
-        <div class="">
-           <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
-            <div 
-            
-                class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg hover:bg-gray-200 duration-300" 
-                v-for="(product, index) in products" 
-                :key="index">
-
-                <NuxtLink :to="`/customer/product/${product.id}`"> 
-
-                    <figure class="flex justify-center p-4">
-                        <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />
-                    </figure>
-
-                    <div class="card-body">
-                        
-                        <p class="card-title text-lg font-bold">{{ product.name }}</p>
-                        <p class="text-base text-blue-800"> {{ product.brand.name }}</p>
-            
-                        <div class="flex place-content-between">
-                            <div class=""> {{ product.price }} ฿</div>
-                            <!-- <div class="card-actions">
-                                <button class="btn btn-primary text-[10px] rounded-[30px] ">Add to Cart</button>
-                            </div> -->
-                        </div>
-
-                    </div>
-
-                </NuxtLink>
-            </div>
-            <!-- <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination> -->
-            </div> 
-
-            
-        </div>
-        
-
-        
-    </div>
-</template>
-
-
 <script setup>
 
 const products = ref([])
@@ -105,3 +51,56 @@ watchEffect(() => {
 // onMounted(fetchProducts)
 
 </script>
+
+<template>
+    <div class="p-10">
+        <div class="flex justify-between">
+            <strong class="text-xl font-semibold align-baseline">All Products</strong>
+            <input 
+                v-model="searchQuery" 
+                @input="searchProducts"
+                placeholder="Search products..." 
+                class="input input-bordered w-60"
+            />
+        </div>
+
+        <div class="">
+           <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 mb-10">
+            <div 
+            
+                class="card card-compact bg-base-100 shadow-xl p-4 rounded-lg hover:bg-gray-200 duration-300" 
+                v-for="(product, index) in products" 
+                :key="index">
+
+                <NuxtLink :to="`/customer/product/${product.id}`"> 
+
+                    <figure class="flex justify-center p-4">
+                        <img :src="product.image_products[0].image_path" class="max-w-full h-40 object-contain" />
+                    </figure>
+
+                    <div class="card-body">
+                        
+                        <p class="card-title text-lg font-bold">{{ product.name }}</p>
+                        <p class="text-base text-blue-800"> {{ product.brand.name }}</p>
+            
+                        <div class="flex place-content-between">
+                            <div class=""> {{ product.price }} ฿</div>
+                            <!-- <div class="card-actions">
+                                <button class="btn btn-primary text-[10px] rounded-[30px] ">Add to Cart</button>
+                            </div> -->
+                        </div>
+
+                    </div>
+
+                </NuxtLink>
+            </div>
+            <!-- <Pagination class="absolute inset-x-0 bottom-10 mt-10 h-1"></Pagination> -->
+            </div> 
+
+            
+        </div>
+        
+
+        
+    </div>
+</template>
