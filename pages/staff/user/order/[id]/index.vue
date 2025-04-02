@@ -115,7 +115,7 @@
                         <td class="p-2 border text-center">{{ order.id }}</td>
                         <td class="p-2 border text-center">{{ order.product_id }}</td>
                         <td class="p-2 border text-center">{{ order.quantity }}</td>
-                        <td class="p-2 border text-center">${{ order.total.toFixed(2) }}</td>
+                        <td class="p-2 border text-center">${{ order.total }}</td>
                         <td class="p-2 border text-center">
                             <span class="font-bold" :class="{
                                 'text-blue-500': order.status === 'Pending',

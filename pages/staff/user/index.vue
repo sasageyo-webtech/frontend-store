@@ -88,7 +88,7 @@
     const goToCustomerOrders = () => {
         if (selectedCustomer.value) {
             router.push({
-                path: `/staff/user/order/${selectedCustomer.value.user_id}`,
+                path: `/staff/user/order/${selectedCustomer.value.customer_id}`,
                 query: { username: selectedCustomer.value.username }
             });
         }
