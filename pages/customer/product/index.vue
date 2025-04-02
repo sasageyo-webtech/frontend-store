@@ -122,6 +122,9 @@ const visiblePages = computed(() => {
 </script>
 
 
+
+
+
 <template>
     <div class="p-10">
       <div class="flex justify-between">
@@ -149,6 +152,7 @@ const visiblePages = computed(() => {
               <p class="text-base text-blue-800"> {{ product.brand.name }}</p>
               <div class="flex place-content-between">
                 <div class=""> {{ product.price }} ฿</div>
+                <div v-if="product" class="badge badge-outline badge-info mt-1">{{ product.category.name }}</div>
               </div>
             </div>
           </NuxtLink>
