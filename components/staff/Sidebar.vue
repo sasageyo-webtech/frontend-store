@@ -58,6 +58,11 @@ const toggleProductMenu = () => {
                                 </NuxtLink>
                             </li>
                             <li>
+                                <NuxtLink to="/staff/product/edit" class="block p-2 text-gray-600 hover:bg-gray-200 rounded">
+                                    Edit Products
+                                </NuxtLink>
+                            </li>
+                            <li>
                                 <NuxtLink to="/staff/product/create" class="block p-2 text-gray-600 hover:bg-gray-200 rounded">
                                     Create Product
                                 </NuxtLink>

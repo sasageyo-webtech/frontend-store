@@ -1,64 +1,57 @@
 <script setup>
-definePageMeta({
-    layout: 'staff',
-});
+    definePageMeta({
+        layout: 'staff',
+    });
 
-const router = useRouter();
-const orders = ref([]);
-const statusOptions = ["All", "PENDING", "APPROVED", "DELIVERED", "SUCCEED", "FAILED"];
-const activeTab = ref("All");
-const errorMessage = ref("");
+    const router = useRouter();
+    const orders = ref([]);
+    const statusOptions = ["All", "PENDING", "APPROVED", "DELIVERED", "SUCCEED", "FAILED"];
+    const activeTab = ref("All");
+    const errorMessage = ref("");
 
-const isConfirmModalOpen = ref(false); // ควบคุม Modal
-const selectedOrder = ref(null);
-const selectedStatus = ref("");
+    const isConfirmModalOpen = ref(false);
+    const selectedOrder = ref(null);
+    const selectedStatus = ref("");
 
-// Fetch orders from API
-const fetchOrders = async () => {
-    try {
-        const response = await apiClient.get('/staffs/orders');
-        orders.value = response.data.data;
-    } catch (error) {
-        errorMessage.value = "Failed to load orders.";
-    }
-};
+    const fetchOrders = async () => {
+        try {
+            const response = await apiClient.get('/staffs/orders');
+            orders.value = response.data.data;
+        } catch (error) {
+            errorMessage.value = "Failed to load orders.";
+        }
+    };
 
-// Filter orders based on selected status
-const filteredOrders = () => {
-    return activeTab.value === "All"
-        ? orders.value
-        : orders.value.filter((order) => order.status === activeTab.value);
-};
+    const filteredOrders = () => {
+        return activeTab.value === "All"
+            ? orders.value
+            : orders.value.filter((order) => order.status === activeTab.value);
+    };
 
-// เปิด Modal ยืนยันการเปลี่ยนสถานะ
-const confirmUpdateOrderStatus = (order, newStatus) => {
-    selectedOrder.value = order;
-    selectedStatus.value = newStatus;
-    isConfirmModalOpen.value = true;
-};
+    const confirmUpdateOrderStatus = (order, newStatus) => {
+        selectedOrder.value = order;
+        selectedStatus.value = newStatus;
+        isConfirmModalOpen.value = true;
+    };
 
-// อัปเดตสถานะออเดอร์
-const updateOrderStatus = async () => {
-    try {
-        const response = await apiClient.patch(`/orders/${selectedOrder.value.order_id}`, { status: selectedStatus.value });
+    const updateOrderStatus = async () => {
+        try {
+            const response = await apiClient.patch(`/orders/${selectedOrder.value.order_id}`, { status: selectedStatus.value });
 
-        // อัปเดต UI ทันที
-        selectedOrder.value.status = selectedStatus.value;
-        // alert(`Order ${selectedOrder.value.order_id} updated to ${selectedStatus.value}!`);
-        
-        isConfirmModalOpen.value = false; // ปิด Modal
-    } catch (error) {
-        alert("Failed to update order status.");
-    }
-};
+            selectedOrder.value.status = selectedStatus.value;
+            // alert(`Order ${selectedOrder.value.order_id} updated to ${selectedStatus.value}!`);
+            
+            isConfirmModalOpen.value = false; // ปิด Modal
+        } catch (error) {
+            alert("Failed to update order status.");
+        }
+    };
 
-// Navigate to order detail page
-const viewOrderDetail = (orderId) => {
-    router.push(`/staff/order/${orderId}`);
-};
+    const viewOrderDetail = (orderId) => {
+        router.push(`/staff/order/${orderId}`);
+    };
 
-// Fetch orders on component mount
-onMounted(fetchOrders);
+    onMounted(fetchOrders);
 </script>
 
 <template>
