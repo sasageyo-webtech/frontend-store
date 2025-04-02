@@ -102,6 +102,7 @@ const createOrder = async () => {
             })
             console.log("Order created successfully", response.data);
             router.push('/customer/order');
+            
         } else {
             throw new Error(response.data.message || "Failed to create order");
         }

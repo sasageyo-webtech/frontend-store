@@ -35,7 +35,6 @@ export default defineNuxtConfig({
     }
   },
   plugins: [
-    '~/plugins/pinia.ts', // ลงทะเบียน plugin
     '~/plugins/sweetalert2.ts'
   ],
 
