@@ -1,0 +1,23 @@
+services:
+    nuxt:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: nuxt-app
+        container_name: nuxt-app
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        volumes:
+            - '.:/app'
+            - '/app/node_modules' # ป้องกันการใช้ node_modules ของ host
+        networks:
+            - sail
+        environment:
+            NODE_ENV: production
+        depends_on:
+            - laravel.test
+
+networks:
+    sail:
+        external: true
