@@ -203,9 +203,9 @@
         <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
 
         <div class="bg-white p-4 shadow-md rounded w-2/3">
-            <!-- NAME -->
             <form @submit.prevent="createProduct">
-                <div class="mb-4">
+                <!-- NAME -->
+                 <div class="mb-4">
                     <label for="name" class="block text-sm font-semibold">Product Name</label>
                     <input
                         type="text"
@@ -245,7 +245,7 @@
                     </div>
 
                     <!-- STOCK -->
-                    <div class="w-1/2">
+                    <!-- <div class="w-1/2">
                         <label for="stock" class="block text-sm font-semibold">Stock</label>
                         <input
                         type="number"
@@ -255,7 +255,7 @@
                         placeholder="Enter stock quantity"
                         required
                         />
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- CATEGORY -->
@@ -301,7 +301,7 @@
                 </div>
 
                 <!-- ACCESSIBILITY -->
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                     <label for="accessibility" class="block text-sm font-semibold">Accessibility</label>
                     <select
                         id="accessibility"
@@ -312,7 +312,7 @@
                         <option value="PUBLIC">Public</option>
                         <option value="PRIVATE">Private</option>
                     </select>
-                </div>
+                </div> -->
 
                 <!-- <div class="mb-4">
                     <label for="image_products" class="block text-sm font-semibold">Product Images</label>
