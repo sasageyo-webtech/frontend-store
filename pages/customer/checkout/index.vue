@@ -1,15 +1,34 @@
 <script setup>
+const { $swal } = useNuxtApp()
 const userStore = useUser()
 const carts = ref([])
 const customer_address = ref({})
 const hasAddress = ref()
 const imageFile = ref(null) 
 const router = useRouter()
-const errorMessage = ref()
 
 const fetchCarts = async () => {
-    const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
-    carts.value = cartsResponse.data.data
+    try {
+        const cartsResponse = await apiClient.get(`/carts?customer_id=${userStore.userInfo.customer_id}`);
+        carts.value = cartsResponse.data.data
+    }catch (error){
+        if(error.response){
+            $swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: 'Please try to refresh again',
+                confirmButtonText: "Back",
+            }).then(result => {
+                if(result.isConfirmed){
+                    router.push("/customer/cart")
+                }
+            })
+        }else{
+            console.log("something wrong not about backend")
+        }
+    }
+
 }
 
 // Calculate the total price (sum of all cart items' total_price + delivery fee)
@@ -44,8 +63,22 @@ const handleFileChange = (event) => {
 
 
 const createOrder = async () => {
+    if (!customer_address.value.customer_address_id){
+        $swal.fire({
+            title: "Please select your address tranfer",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        })
+        return;
+    }
     if (!imageFile.value) {
-        alert("Please upload the QR code image.");
+        $swal.fire({
+            title: "Please upload your tranfer slip",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        })
         return;
     }
 
@@ -61,7 +94,12 @@ const createOrder = async () => {
 
         // ตรวจสอบสถานะ HTTP Response
         if (response.status === 201 || response.status === 200) {
-            alert("Order created successfully!");
+            $swal.fire({
+                title: "Create order successfully!",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            })
             console.log("Order created successfully", response.data);
             router.push('/customer/order');
         } else {
