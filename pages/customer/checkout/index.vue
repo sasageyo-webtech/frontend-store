@@ -6,7 +6,6 @@ const customer_address = ref({})
 const hasAddress = ref()
 const imageFile = ref(null) 
 const router = useRouter()
-const errorMessage = ref()
 
 const fetchCarts = async () => {
     try {
@@ -64,8 +63,22 @@ const handleFileChange = (event) => {
 
 
 const createOrder = async () => {
+    if (!customer_address.value.customer_address_id){
+        $swal.fire({
+            title: "Please select your address tranfer",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        })
+        return;
+    }
     if (!imageFile.value) {
-        alert("Please upload the QR code image.");
+        $swal.fire({
+            title: "Please upload your tranfer slip",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        })
         return;
     }
 
@@ -81,7 +94,12 @@ const createOrder = async () => {
 
         // ตรวจสอบสถานะ HTTP Response
         if (response.status === 201 || response.status === 200) {
-            alert("Order created successfully!");
+            $swal.fire({
+                title: "Create order successfully!",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            })
             console.log("Order created successfully", response.data);
             router.push('/customer/order');
         } else {
