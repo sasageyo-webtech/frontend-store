@@ -14,6 +14,10 @@
 
     const API_BASE = 'http://localhost/api/products';
 
+    const currentPage = ref(1);
+    const totalPages = ref(1);
+    const itemsPerPage = 20;
+
     const fetchProductDetails = async () => {
         try {
             const response = await axios.get(`${API_BASE}/${productId}`);
@@ -25,15 +29,29 @@
         }
     };
 
-    const fetchReviews = async () => {
+    const fetchReviews = async (page = 1) => {
         try {
-            const response = await axios.get(`${API_BASE}/${productId}/reviews`);
+            const response = await axios.get(`${API_BASE}/${productId}/reviews`, {
+                params: { 
+                    page,  
+                    limit: itemsPerPage,
+                },
+            });
+
             reviews.value = response.data.data;
+            totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
         } catch {
             errorMessage.value = 'Failed to load reviews.';
         }
     };
-    
+
+    const changePage = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages.value) {
+            currentPage.value = newPage;
+            fetchProducts(newPage);
+        }
+    };
+
     const goBack = () => {
         window.history.back();
     };
@@ -104,6 +122,19 @@
                         </div>
                     </div>
                     <p class="mt-2 text-gray-700">{{ review.comment }}</p>
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="flex justify-center mt-4 space-x-2">
+                    <button @click="changePage(currentPage - 1)" class="px-4 py-2 bg-gray-300 hover:bg-gray-700 hover:text-white rounded border border-[rgba(0,0,0,0.1)]">
+                        Prev
+                    </button>
+
+                    <span class="px-4 py-2" >{{ currentPage }} / {{ totalPages }}</span>
+
+                    <button @click="changePage(currentPage + 1)" class="px-4 py-2 bg-gray-300 hover:bg-gray-700 hover:text-white rounded border border-[rgba(0,0,0,0.1)]">
+                        Next
+                    </button>
                 </div>
             </div>
         </div>

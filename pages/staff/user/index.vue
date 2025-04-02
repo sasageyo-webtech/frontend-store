@@ -11,7 +11,7 @@
 
     const currentPage = ref(1);
     const totalPages = ref(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
 
     const customers = ref([]);
     const selectedCustomer = ref(null);
@@ -36,6 +36,10 @@
             if (response.data) {
                 customers.value = response.data.data;
                 totalPages.value = Math.ceil(response.data.meta.total / itemsPerPage);
+                console.log("Data : ", response.data.data)
+                console.log("Meta Total : ", response.data.meta.total)
+                console.log("Items : ", itemsPerPage)
+                console.log("Total pages : ", totalPages)
             } else {
                 errorMessage.value = 'Failed to fetch customers: Invalid data format.';
             }

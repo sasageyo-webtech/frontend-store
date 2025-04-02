@@ -55,7 +55,7 @@
     <div class="mt-10 mx-16">
         <h1 class="text-2xl font-bold mb-4">Orders for Customer {{ username }}</h1>
 
-        <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+        <!-- <div v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div> -->
 
         <div class="flex gap-4 mb-4">
             <button v-for="status in statusOptions" :key="status" @click="activeTab = status"

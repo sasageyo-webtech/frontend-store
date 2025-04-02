@@ -90,13 +90,9 @@
     };
 
     const fetchCategories = async () => {
-        console.log("TEST : ", )
         try {
-            console.log("TEST 2 : ", )
             const response = await axios.get(CATEGORY_API_BASE);
-            console.log("TEST 3 : ", )
             categories.value = response.data.data;
-            console.log("Category : ",  response.data.data)
         } catch (error) {
             console.error('Category Fetch Error:', error.message);
             errorMessage.value = 'Failed to fetch categories.';
