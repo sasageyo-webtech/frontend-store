@@ -1,5 +1,7 @@
 <script setup>
 
+const  { $swal } = useNuxtApp()
+
 const products = ref([]);
 const searchQuery = ref('');
 const currentPage = ref(1);
@@ -11,6 +13,17 @@ const fetchProducts = async () => {
   pagination.value = { last_page: 1 };
 
   const { category_id, brand_id } = useRoute().query;
+
+    // แสดง SweetAlert กำลังโหลด
+    $swal.fire({
+        title: 'Product is loading...',
+        text: 'wait a minute....',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            $swal.showLoading();
+        },
+    });
   try {
     let url = '/products';
     if (category_id) url += `/categories/${category_id}`;
@@ -23,6 +36,11 @@ const fetchProducts = async () => {
     products.value = response.data.data;
     pagination.value = response.data.meta;
     isSearching.value = false;
+
+    // หน่วงเวลา 1 วินาทีก่อนปิด SweetAlert
+    await new Promise(resolve => setTimeout(resolve, 500));
+    $swal.close();
+
   } catch (error) {
     console.error('Error fetching products:', error);
   }
@@ -37,6 +55,17 @@ const searchProducts = async () => {
     return;
   }
 
+   // แสดง SweetAlert กำลังโหลด
+   $swal.fire({
+        title: 'Product is loading...',
+        text: 'wait a minute....',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            $swal.showLoading();
+        },
+    });
+
   try {
     const response = await apiClient.get('/products/search', {
       params: { query: searchQuery.value, page: currentPage.value }
@@ -45,6 +74,11 @@ const searchProducts = async () => {
     products.value = response.data.data;
     pagination.value = response.data.meta;
     isSearching.value = true;
+
+        // หน่วงเวลา 1 วินาทีก่อนปิด SweetAlert
+    await new Promise(resolve => setTimeout(resolve, 300));
+    $swal.close();
+
   } catch (error) {
     console.error('Error searching products:', error);
   }
