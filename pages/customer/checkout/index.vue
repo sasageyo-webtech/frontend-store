@@ -102,7 +102,7 @@ const createOrder = async () => {
             })
             console.log("Order created successfully", response.data);
             router.push('/customer/order');
-            
+
         } else {
             throw new Error(response.data.message || "Failed to create order");
         }
@@ -219,13 +219,13 @@ watchEffect(() => {
                         </h1>
                         <div v-if="hasAddress">
                             <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
-                                <legend class="text-sm/6 font-semibold text-gray-900">Peter Parker</legend>
+                                <legend class="text-sm/6 font-semibold text-gray-900">{{ customer_address.name }}</legend>
                                 <div class="mt-1 text-sm/6 text-gray-600">
-                                    <p>098-765-4321</p>
-                                    <p>THAILAND</p>
-                                    <p>Bangkok, Jatuchak, Sena Nikhom</p>
-                                    <p>123, PS, Main St., 10001</p>
-                                    <p class="text-gray-600">Apartment 5B, Near Central Park</p>
+                                    <p>{{ customer_address.phone_number }}</p>
+                                    <p>{{ customer_address.country }}</p>
+                                    <p>{{ customer_address.province }}, {{ customer_address.district }}, {{ customer_address.sub_district }}</p>
+                                    <p>{{ customer_address.house_number }}, {{ customer_address.building }}, {{ customer_address.street }} St., {{ customer_address.postal_code }}</p>
+                                    <p class="text-gray-600">{{ customer_address.detail_address }}</p>
                                 </div>
                             </div>
                         </div>

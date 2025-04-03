@@ -71,9 +71,9 @@ onMounted(async () => {
           <li class="pr-20">
             <details>
               <summary class="text-white">Category</summary>
-              <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
+              <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg z-[50]">
                 <li><NuxtLink to="/customer/product">All</NuxtLink></li>
-                <li v-for="category in categories" :key="category.id">
+                <li v-for="category in categories" :key="category.id" class="]">
                   <NuxtLink :to="`/customer/product?category_id=${category.id}`">{{ category.name }}</NuxtLink>
                 </li>
               </ul>
@@ -83,7 +83,7 @@ onMounted(async () => {
           <li>
             <details>
               <summary class="text-white">Brand</summary>
-              <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg">
+              <ul class="bg-base-100 rounded-t-none p-4 w-48 shadow-lg z-[50]">
                 <li><NuxtLink to="/customer/product">All</NuxtLink></li>
                 <li v-for="brand in brands" :key="brand.id">
                   <NuxtLink :to="`/customer/product?brand_id=${brand.id}`">{{ brand.name }}</NuxtLink>
