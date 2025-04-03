@@ -10,6 +10,7 @@ const reviews = ref([])
 const { product_id } = useRoute().params
 const router = useRouter()
 const showAllReviews = ref(false)
+const reviewTotal = ref(0)
 
 // ✅ เพิ่ม state สำหรับเก็บค่าฟอร์มรีวิว
 const reviewText = ref('')
@@ -47,6 +48,7 @@ const fetchReview = async () => {
     try {
         const response = await apiClient.get(`/products/${product_id}/reviews`)
         reviews.value = response.data.data.slice(0, 5)
+        reviewTotal.value = response.data.meta.total
     } catch (error) {
         console.error('Error fetching reviews', error)
     }
@@ -57,6 +59,7 @@ const fetchReviews = async () => {
     try {
         const response = await apiClient.get(`/products/${product_id}/reviews`)
         reviews.value = response.data.data
+        reviewTotal.value = response.data.meta.total
     } catch (error) {
         console.error('Error fetching reviews', error)
     }
@@ -115,19 +118,12 @@ const submitReview = async () => {
 
             console.log("Review submitted:", response.data)
 
-            // เพิ่มรีวิวใหม่เข้าไปที่ `reviews`
-            reviews.value.unshift({
-                user: {
-                    username: userStore.userInfo.username,
-                    image_path: userStore.userInfo.profile_image
-                },
-                comment: reviewText.value,
-                rating: selectedRating.value
-            })
-
             // เคลียร์ค่าฟอร์ม
             reviewText.value = ''
             selectedRating.value = 0
+
+            router.go(0)
+
         } catch (error) {
             console.error("Error submitting review:", error.response?.data || error.message)
         }
@@ -188,7 +184,7 @@ onMounted(async () => {
 
                       </div>      
                       <div class="px-5 text-xs text-gray-800">
-                        {{ reviews.length }} Reviewers
+                        {{ reviewTotal }} Reviewers
                       </div>
                 </div>
          
