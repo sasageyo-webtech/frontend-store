@@ -37,7 +37,7 @@ Start the development server on `http://localhost:3000`:
 staff: admin@gmail.com    
 password: password
 
-customer: test@gmail.
+customer: test@gmail.com
 password: password
 
 ## Release Tag v1.0.0
