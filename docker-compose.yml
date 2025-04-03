@@ -3,8 +3,8 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: nuxt-app
-        container_name: nuxt-app
+        image: fronend-store
+        container_name: fronend-store
         restart: unless-stopped
         ports:
             - '3000:3000'
@@ -15,8 +15,7 @@ services:
             - sail
         environment:
             NODE_ENV: production
-        depends_on:
-            - laravel.test
+     
 
 networks:
     sail:
