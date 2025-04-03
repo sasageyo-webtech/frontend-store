@@ -2,9 +2,9 @@
 
 ## Member
 
-- อติราช แก้ววิเชียร 6510451051
-- ภัฎฎารินธ์ ไฝ่ทอง 6510450771
-- อควอรัตน์ ธิติวุฒิกร 6510451026
+- อติราช แก้ววิเชียร / 6510451051 / FLUKKIES
+- ภัฎฎารินธ์ ไฝ่ทอง / 6510450771 / Blooosker
+- อควอรัตน์ ธิติวุฒิกร / 6510451026 / aquarat101
 
 ## Setup
 
@@ -30,3 +30,14 @@ docker-compose up -d
 ## Development Server
 
 Start the development server on `http://localhost:3000`:
+
+
+## Default Username and Password
+
+staff: admin@gmail.com    
+password: password
+
+customer: test@gmail.
+password: password
+
+## Release Tag v1.0.0
