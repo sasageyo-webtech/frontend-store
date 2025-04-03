@@ -1,0 +1,22 @@
+services:
+    nuxt:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: fronend-store
+        container_name: fronend-store
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        volumes:
+            - '.:/app'
+            - '/app/node_modules' # ป้องกันการใช้ node_modules ของ host
+        networks:
+            - sail
+        environment:
+            NODE_ENV: production
+     
+
+networks:
+    sail:
+        external: true

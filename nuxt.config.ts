@@ -1,10 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
+  // pages: false,
+
   modules: [
     '@vueuse/nuxt',
-    "@nuxtjs/tailwindcss"
+    "@nuxtjs/tailwindcss",
+    '@pinia/nuxt',
   ],
+
+  pinia: {
+    storesDirs: ['./stores/**', './custom-folder/stores/**'],
+  },
+
+
 
   css: ['~/assets/css/main.css'],
 
@@ -14,5 +23,27 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: "2025-02-22"
+  alias: {
+    '@api': '/api'  // Update this path to point to your actual API folder
+  },
+
+  compatibilityDate: "2025-02-22",
+
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost',
+    }
+  },
+  plugins: [
+    '~/plugins/sweetalert2.ts'
+  ],
+
+  imports: {
+    dirs: [
+      'types',
+      'plugins'
+    ]
+  }
+
+  
 })
