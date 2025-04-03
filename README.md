@@ -1,76 +1,32 @@
-# Nuxt Minimal Starter
+#  Online Store System (Sasageyo) Frontend
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Member
+
+- อติราช แก้ววิเชียร 6510451051
+- ภัฎฎารินธ์ ไฝ่ทอง 6510450771
+- อควอรัตน์ ธิติวุฒิกร 6510451026
 
 ## Setup
 
-Make sure to install dependencies:
+สร้างไฟล์ .env แล้วกำหนด ตามนี้
 
 ```bash
-# npm
-npm install
 
-# pnpm
-pnpm install
+BASE_URL="http://localhost"
 
-# yarn
-yarn install
-
-# bun
-bun install
 ```
+
+รันคำสั่งนี้สร้าง image และ container ของ docker ด้วย
+
+```bash
+# สำหรับการ run ครั้งแรก
+docker-compose up --build
+
+# สำหรับการ run เพื่อพัฒนา App
+docker-compose up -d
+```
+
 
 ## Development Server
 
 Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
